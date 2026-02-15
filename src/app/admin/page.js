@@ -43,11 +43,11 @@ export default function AdminPage() {
     const fetchData = async () => {
         try {
             const [compRes, bmRes, scoreRes, annRes, usersRes] = await Promise.all([
-                fetch('/api/competitors'),
-                fetch('/api/bonus-malus'),
-                fetch('/api/scores'),
-                fetch('/api/announcements'),
-                fetch('/api/users')
+                fetch('/api/competitors', { cache: 'no-store' }),
+                fetch('/api/bonus-malus', { cache: 'no-store' }),
+                fetch('/api/scores', { cache: 'no-store' }),
+                fetch('/api/announcements', { cache: 'no-store' }),
+                fetch('/api/users', { cache: 'no-store' })
             ]);
 
             if (compRes.ok) { const data = await compRes.json(); setCompetitors(data.competitors || []); }

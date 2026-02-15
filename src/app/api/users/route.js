@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
     try {
         const user = await getUserFromRequest(request);
@@ -11,8 +13,14 @@ export async function GET(request) {
 
         const users = await prisma.user.findMany({
             include: {
-                team: true,
-                scoreEvents: { select: { id: true } } // Just to know if they assigned scores
+                team: {
+                    include: {
+                        competitors: {
+                            include: { competitor: true }
+                        }
+                    }
+                },
+                scoreEvents: { select: { id: true } }
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -24,6 +32,7 @@ export async function GET(request) {
             email: u.email,
             role: u.role,
             teamName: u.team?.name || 'Nessuna Squadra',
+            teamDetails: u.team?.competitors.map(tc => tc.competitor) || [],
             scoresAssignedCount: u.scoreEvents.length,
             createdAt: u.createdAt
         }));

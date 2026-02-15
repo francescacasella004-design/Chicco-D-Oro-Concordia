@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, Check } from 'lucide-react';
+import { Bell, BellOff, Check, Share } from 'lucide-react';
 
 export default function NotificationButton() {
     const [status, setStatus] = useState('loading'); // loading, default, granted, denied, error

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Share, Menu, Download } from 'lucide-react';
+import { Share, Menu } from 'lucide-react';
+import NotificationButton from '@/components/NotificationButton';
 
 export const metadata = {
     title: 'Scarica l\'App - Fantachicco',
@@ -45,7 +46,13 @@ export default function InstallPage() {
 
                 </div>
 
-                <Link href="/" className="btn btn-primary">
+                <div style={{ marginBottom: '40px', padding: '20px', background: 'var(--bg-card)', borderRadius: 'var(--radius)', border: '2px solid var(--primary)' }}>
+                    <h2 style={{ color: 'var(--primary)', marginBottom: '10px' }}>🔔 Resta Aggiornato!</h2>
+                    <p style={{ marginBottom: '15px' }}>Ricevi una notifica sul telefono quando esce un nuovo avviso o bonus!</p>
+                    <NotificationButton />
+                </div>
+
+                <Link href="/" className="btn btn-secondary">
                     Torna alla Home
                 </Link>
             </div>

@@ -10,6 +10,15 @@ export default function SquadraPage() {
     const [showModal, setShowModal] = useState(false);
     const [modalContent, setModalContent] = useState({ type: '', title: '', message: '' });
 
+    // Restored State
+    const [competitors, setCompetitors] = useState([]);
+    const [team, setTeam] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [captainId, setCaptainId] = useState(null);
+    const [teamName, setTeamName] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     const BUDGET = 100;
 
     useEffect(() => {

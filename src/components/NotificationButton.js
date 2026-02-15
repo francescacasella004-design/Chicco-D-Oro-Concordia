@@ -6,7 +6,13 @@ export default function NotificationButton() {
     const [status, setStatus] = useState('loading'); // loading, default, granted, denied, error
     const [subscribing, setSubscribing] = useState(false);
 
+    const [isIOS, setIsIOS] = useState(false);
+
     useEffect(() => {
+        // Check if it's iOS
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        setIsIOS(isIOSDevice);
+
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             checkSubscription();
         } else {
@@ -73,7 +79,22 @@ export default function NotificationButton() {
     };
 
     if (status === 'loading') return null;
-    if (status === 'unsupported') return <p className="text-sm text-red-500">Notifiche non supportate su questo dispositivo.</p>;
+
+    if (status === 'unsupported') {
+        if (isIOS) {
+            return (
+                <div className="text-sm text-warning" style={{ color: 'var(--text-light)' }}>
+                    <p style={{ marginBottom: 5 }}>⚠️ <strong>Su iPhone:</strong></p>
+                    Per attivare le notifiche, devi prima <strong>aggiungere questa app alla Home</strong>.
+                    <br />
+                    1. Premi Condividi <Share size={14} style={{ display: 'inline' }} />
+                    <br />
+                    2. "Aggiungi alla schermata Home"
+                </div>
+            );
+        }
+        return <p className="text-sm text-red-500">Notifiche non supportate su questo dispositivo.</p>;
+    }
     if (status === 'denied') return <p className="text-sm text-red-500">Hai bloccato le notifiche. Sbloccole dalle impostazioni del browser.</p>;
     if (status === 'granted') return (
         <div className="btn btn-secondary disabled" style={{ cursor: 'default', opacity: 0.8 }}>

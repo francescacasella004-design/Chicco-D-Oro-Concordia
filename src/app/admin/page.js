@@ -349,85 +349,84 @@ export default function AdminPage() {
                             <button className="btn btn-primary" onClick={() => handleCreate('announcement')}>Pubblica Avviso</button>
                         </div>
                     </div>
-                    </div>
                 )}
 
-            {/* === UTENTI === */}
-            {activeTab === 'utenti' && (
-                <div>
-                    <h2 className="card-title">👥 Gestione Utenti</h2>
-                    <div style={{ maxHeight: 500, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
-                        {users.map(u => (
-                            <div key={u.id} className="score-history-item">
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    <div><strong>{u.name}</strong> <span style={{ fontSize: '0.8em', opacity: 0.7 }}>({u.role})</span></div>
-                                    <div style={{ fontSize: '0.9em' }}>📧 {u.email}</div>
-                                    <div style={{ fontSize: '0.9em' }}>🏆 Squadra: <strong>{u.teamName}</strong></div>
+                {/* === UTENTI === */}
+                {activeTab === 'utenti' && (
+                    <div>
+                        <h2 className="card-title">👥 Gestione Utenti</h2>
+                        <div style={{ maxHeight: 500, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
+                            {users.map(u => (
+                                <div key={u.id} className="score-history-item">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        <div><strong>{u.name}</strong> <span style={{ fontSize: '0.8em', opacity: 0.7 }}>({u.role})</span></div>
+                                        <div style={{ fontSize: '0.9em' }}>📧 {u.email}</div>
+                                        <div style={{ fontSize: '0.9em' }}>🏆 Squadra: <strong>{u.teamName}</strong></div>
+                                    </div>
+                                    <button
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => handleDelete('user', u.id)}
+                                        disabled={u.role === 'admin' || u.scoresAssignedCount > 0}
+                                        title={u.scoresAssignedCount > 0 ? "Non puoi eliminare chi ha assegnato punteggi" : "Elimina Utente"}
+                                    >
+                                        🗑️
+                                    </button>
                                 </div>
-                                <button
-                                    className="btn btn-sm btn-danger"
-                                    onClick={() => handleDelete('user', u.id)}
-                                    disabled={u.role === 'admin' || u.scoresAssignedCount > 0}
-                                    title={u.scoresAssignedCount > 0 ? "Non puoi eliminare chi ha assegnato punteggi" : "Elimina Utente"}
-                                >
-                                    🗑️
-                                </button>
-                            </div>
-                        ))}
-                        {users.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>Nessun utente registrato</div>}
+                            ))}
+                            {users.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>Nessun utente registrato</div>}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
-
-            {/* === EDIT MODAL === */ }
-    {
-        showEditModal && editingItem && (
-            <div style={{
-                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-            }}>
-                <div className="card" style={{ width: '90%', maxWidth: 500 }}>
-                    <h2 className="card-title">Modifica Elemento</h2>
-
-                    {editingItem.type === 'competitor' && (
-                        <div className="grid" style={{ gap: 16 }}>
-                            <input className="form-input" value={editingItem.data.name} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, name: e.target.value } })} placeholder="Nome" />
-                            <select className="form-input" value={editingItem.data.type} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, type: e.target.value } })}>
-                                <option value="bambino">Bambino</option>
-                                <option value="animatore">Animatore</option>
-                            </select>
-                            <input className="form-input" type="number" value={editingItem.data.cost} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, cost: parseInt(e.target.value) } })} placeholder="Costo" />
-                        </div>
-                    )}
-
-                    {editingItem.type === 'bonus' && (
-                        <div className="grid" style={{ gap: 16 }}>
-                            <input className="form-input" value={editingItem.data.description} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })} placeholder="Descrizione" />
-                            <input className="form-input" type="number" value={editingItem.data.points} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, points: parseInt(e.target.value) } })} placeholder="Punti" />
-                            <input className="form-input" value={editingItem.data.category} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })} placeholder="Categoria" />
-                        </div>
-                    )}
-
-                    {editingItem.type === 'announcement' && (
-                        <div className="grid" style={{ gap: 16 }}>
-                            <input className="form-input" value={editingItem.data.title} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })} placeholder="Titolo" />
-                            <textarea className="form-input" style={{ height: 100 }} value={editingItem.data.content} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, content: e.target.value } })} placeholder="Contenuto" />
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <input type="checkbox" checked={editingItem.data.pinned} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, pinned: e.target.checked } })} />
-                                Pinned
-                            </label>
-                        </div>
-                    )}
-
-                    <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
-                        <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Annulla</button>
-                        <button className="btn btn-primary" onClick={handleUpdate}>Salva Modifiche</button>
-                    </div>
-                </div>
+                )}
             </div>
-        )
-    }
+
+            {/* === EDIT MODAL === */}
+            {
+                showEditModal && editingItem && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                    }}>
+                        <div className="card" style={{ width: '90%', maxWidth: 500 }}>
+                            <h2 className="card-title">Modifica Elemento</h2>
+
+                            {editingItem.type === 'competitor' && (
+                                <div className="grid" style={{ gap: 16 }}>
+                                    <input className="form-input" value={editingItem.data.name} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, name: e.target.value } })} placeholder="Nome" />
+                                    <select className="form-input" value={editingItem.data.type} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, type: e.target.value } })}>
+                                        <option value="bambino">Bambino</option>
+                                        <option value="animatore">Animatore</option>
+                                    </select>
+                                    <input className="form-input" type="number" value={editingItem.data.cost} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, cost: parseInt(e.target.value) } })} placeholder="Costo" />
+                                </div>
+                            )}
+
+                            {editingItem.type === 'bonus' && (
+                                <div className="grid" style={{ gap: 16 }}>
+                                    <input className="form-input" value={editingItem.data.description} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })} placeholder="Descrizione" />
+                                    <input className="form-input" type="number" value={editingItem.data.points} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, points: parseInt(e.target.value) } })} placeholder="Punti" />
+                                    <input className="form-input" value={editingItem.data.category} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })} placeholder="Categoria" />
+                                </div>
+                            )}
+
+                            {editingItem.type === 'announcement' && (
+                                <div className="grid" style={{ gap: 16 }}>
+                                    <input className="form-input" value={editingItem.data.title} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })} placeholder="Titolo" />
+                                    <textarea className="form-input" style={{ height: 100 }} value={editingItem.data.content} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, content: e.target.value } })} placeholder="Contenuto" />
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <input type="checkbox" checked={editingItem.data.pinned} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, pinned: e.target.checked } })} />
+                                        Pinned
+                                    </label>
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
+                                <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Annulla</button>
+                                <button className="btn btn-primary" onClick={handleUpdate}>Salva Modifiche</button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         </div >
     );
 }

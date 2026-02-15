@@ -1,5 +1,5 @@
-/* ================================================
-   FANTACHICCO — RETRO 70s/80s/90s DESIGN SYSTEM  
+﻿/* ================================================
+   FANTACHICCO â€” RETRO 70s/80s/90s DESIGN SYSTEM  
    ================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -20,7 +20,7 @@
   --success: #4CAF50;
   --warning: #F2C12E;
   --danger: #D32F2F;
-  --bg: #FFF8F0;                 /* Crema caldo retrò */
+  --bg: #FFF8F0;                 /* Crema caldo retrÃ² */
   --bg-card: #FFFFFF;
   --bg-dark: #1A1A2E;           /* Notte '80s */
   --text: #1A1A2E;
@@ -57,7 +57,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
-  /* Dot pattern — sottile texture vintage */
+  /* Dot pattern â€” sottile texture vintage */
   background-image: radial-gradient(circle, #e8d5c4 0.8px, transparent 0.8px);
   background-size: 24px 24px;
 }
@@ -76,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 20px;
 }
 
-/* ===== NAVBAR — retro bar ===== */
+/* ===== NAVBAR â€” retro bar ===== */
 .navbar {
   background: var(--bg-dark);
   border-bottom: 4px solid var(--primary);
@@ -194,7 +194,7 @@ h1, h2, h3, h4, h5, h6 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== BUTTONS — bold retro ===== */
+/* ===== BUTTONS â€” bold retro ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -288,7 +288,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: none !important;
 }
 
-/* ===== CARDS — retro with bold border ===== */
+/* ===== CARDS â€” retro with bold border ===== */
 .card {
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -358,7 +358,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 6px;
 }
 
-/* ===== HERO — retro gradient ===== */
+/* ===== HERO â€” retro gradient ===== */
 .hero {
   background: var(--gradient-hero);
   padding: 80px 20px;
@@ -782,7 +782,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.95rem;
 }
 
-/* ===== FOOTER — dark retro ===== */
+/* ===== FOOTER â€” dark retro ===== */
 .footer {
   background: var(--bg-dark);
   color: rgba(255, 255, 255, 0.7);
@@ -1002,94 +1002,93 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
   }
 }
-/ *   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
-       R E S P O N S I V E   Q U E R I E S  
-       = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =   * /  
-  
- @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   {  
-  
-         / *   L a y o u t   A d j u s t m e n t s   * /  
-         . c o n t a i n e r   {  
-                 p a d d i n g :   0   1 6 p x ;  
-         }  
-  
-         / *   N a v b a r   * /  
-         . n a v b a r - i n n e r   {  
-                 h e i g h t :   6 0 p x ;  
-         }  
-  
-         . n a v b a r - l i n k s ,  
-         . n a v b a r - u s e r   {  
-                 d i s p l a y :   n o n e ;  
-         }  
-  
-         . h a m b u r g e r   {  
-                 d i s p l a y :   b l o c k ;  
-                 c o l o r :   v a r ( - - s e c o n d a r y ) ;  
-         }  
-  
-         / *   G r i d   S t a c k i n g   * /  
-         . g r i d - 2 ,  
-         . g r i d - 3 ,  
-         . g r i d - 4   {  
-                 g r i d - t e m p l a t e - c o l u m n s :   1 f r ;  
-         }  
-  
-         . a d m i n - g r i d   {  
-                 g r i d - t e m p l a t e - c o l u m n s :   1 f r ;  
-         }  
-  
-         / *   T y p o g r a p h y   &   H e r o   * /  
-         . h e r o - t i t l e   {  
-                 f o n t - s i z e :   2 . 2 r e m ;  
-         }  
-  
-         . h e r o - b u t t o n s   {  
-                 f l e x - d i r e c t i o n :   c o l u m n ;  
-                 w i d t h :   1 0 0 % ;  
-                 g a p :   1 2 p x ;  
-         }  
-  
-         . h e r o - b u t t o n s   . b t n   {  
-                 w i d t h :   1 0 0 % ;  
-         }  
-  
-         / *   C o m p o n e n t s   * /  
-         . s t e p s   . s t e p   {  
-                 f l e x - d i r e c t i o n :   c o l u m n ;  
-                 a l i g n - i t e m s :   c e n t e r ;  
-                 t e x t - a l i g n :   c e n t e r ;  
-         }  
-  
-         . s t e p - n u m b e r   {  
-                 m a r g i n - b o t t o m :   1 2 p x ;  
-         }  
-  
-         . c a r d   {  
-                 p a d d i n g :   2 0 p x ;  
-         }  
-  
-         . l e a d e r b o a r d - i t e m   {  
-                 f l e x - d i r e c t i o n :   c o l u m n ;  
-                 a l i g n - i t e m s :   f l e x - s t a r t ;  
-                 g a p :   1 2 p x ;  
-         }  
-  
-         . l e a d e r b o a r d - r a n k   {  
-                 m a r g i n - b o t t o m :   4 p x ;  
-         }  
-  
-         . l e a d e r b o a r d - i n f o   {  
-                 w i d t h :   1 0 0 % ;  
-         }  
-  
-         . l e a d e r b o a r d - s c o r e   {  
-                 a l i g n - s e l f :   f l e x - e n d ;  
-         }  
-  
-         / *   F o o t e r   * /  
-         . f o o t e r   {  
-                 p a d d i n g :   3 0 p x   2 0 p x ;  
-         }  
- }  
- 
+/* ================================================
+   RESPONSIVE QUERIES
+   ================================================ */
+
+@media (max-width: 768px) {
+
+    /* Layout Adjustments */
+    .container {
+        padding: 0 16px;
+    }
+
+    /* Navbar */
+    .navbar-inner {
+        height: 60px;
+    }
+
+    .navbar-links,
+    .navbar-user {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+        color: var(--secondary);
+    }
+
+    /* Grid Stacking */
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Typography & Hero */
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    /* Components */
+    .steps .step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .step-number {
+        margin-bottom: 12px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .leaderboard-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .leaderboard-rank {
+        margin-bottom: 4px;
+    }
+
+    .leaderboard-info {
+        width: 100%;
+    }
+
+    .leaderboard-score {
+        align-self: flex-end;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 30px 20px;
+    }
+}

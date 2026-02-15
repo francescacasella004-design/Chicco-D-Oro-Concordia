@@ -1,34 +1,37 @@
-﻿/* ================================================
-   FANTACHICCO â€” RETRO 70s/80s/90s DESIGN SYSTEM  
-   ================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   /* === RETRO PALETTE === */
-  --primary: #E8531E;            /* Arancio '70s */
+  --primary: #E8531E;
+  /* Arancio '70s */
   --primary-light: #F28C5A;
   --primary-dark: #C43D10;
-  --secondary: #F2C12E;          /* Giallo senape */
+  --secondary: #F2C12E;
+  /* Giallo senape */
   --secondary-light: #FADE8B;
-  --accent: #E6267A;             /* Magenta '80s */
+  --accent: #E6267A;
+  /* Magenta '80s */
   --accent-light: #FF6EB4;
-  --teal: #00B4A2;               /* Teal '90s */
+  --teal: #00B4A2;
+  /* Teal '90s */
   --teal-light: #6BDED0;
-  --purple: #7B2D8E;             /* Viola disco */
+  --purple: #7B2D8E;
+  /* Viola disco */
   --purple-light: #B366CC;
   --success: #4CAF50;
   --warning: #F2C12E;
   --danger: #D32F2F;
-  --bg: #FFF8F0;                 /* Crema caldo retrÃ² */
+  --bg: #FFF8F0;
+  /* Crema caldo retrÃ² */
   --bg-card: #FFFFFF;
-  --bg-dark: #1A1A2E;           /* Notte '80s */
+  --bg-dark: #1A1A2E;
+  /* Notte '80s */
   --text: #1A1A2E;
   --text-light: #5A5A6E;
   --text-muted: #9E9EB0;
   --border: #E8D5C4;
-  --shadow: 0 4px 0 rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.06);
-  --shadow-lg: 0 6px 0 rgba(0,0,0,0.12), 0 10px 40px rgba(0,0,0,0.1);
+  --shadow: 0 4px 0 rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 6px 0 rgba(0, 0, 0, 0.12), 0 10px 40px rgba(0, 0, 0, 0.1);
   --radius: 12px;
   --radius-sm: 8px;
   --radius-full: 50px;
@@ -62,7 +65,12 @@ body {
   background-size: 24px 24px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 400;
   line-height: 1.2;
@@ -113,7 +121,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar-links a {
   text-decoration: none;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 600;
   font-size: 0.88rem;
   padding: 8px 14px;
@@ -138,7 +146,7 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-user-name {
   font-weight: 600;
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .hamburger {
@@ -174,7 +182,7 @@ h1, h2, h3, h4, h5, h6 {
 .mobile-menu a {
   display: block;
   text-decoration: none;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
   font-size: 1.1rem;
   padding: 14px 20px;
@@ -190,8 +198,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== BUTTONS â€” bold retro ===== */
@@ -272,7 +287,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 8px 18px;
   font-size: 0.82rem;
   min-height: 38px;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
 }
 
 .btn-lg {
@@ -377,15 +392,15 @@ h1, h2, h3, h4, h5, h6 {
   width: 200%;
   height: 200%;
   transform: translate(-50%, -50%);
-  background: repeating-conic-gradient(
-    rgba(255,255,255,0.04) 0deg 10deg,
-    transparent 10deg 20deg
-  );
+  background: repeating-conic-gradient(rgba(255, 255, 255, 0.04) 0deg 10deg,
+      transparent 10deg 20deg);
   animation: spin-slow 60s linear infinite;
 }
 
 @keyframes spin-slow {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .hero-title {
@@ -393,7 +408,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: clamp(2.5rem, 7vw, 4.5rem);
   margin-bottom: 16px;
   position: relative;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
   letter-spacing: 2px;
 }
 
@@ -415,8 +430,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 .hero-buttons {
@@ -453,9 +475,17 @@ h1, h2, h3, h4, h5, h6 {
   gap: 20px;
 }
 
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
 
 /* ===== COMPETITOR CARD ===== */
 .competitor-card {
@@ -501,7 +531,7 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
   font-weight: 700;
   font-family: var(--font-heading);
-  border: 3px solid rgba(0,0,0,0.1);
+  border: 3px solid rgba(0, 0, 0, 0.1);
 }
 
 .competitor-name {
@@ -602,7 +632,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--secondary);
   color: white;
   border-color: #D4A00A;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .leaderboard-item.top-2 .leaderboard-rank {
@@ -635,7 +665,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-size: 1.5rem;
   color: var(--primary);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .leaderboard-points {
@@ -681,7 +711,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 14px;
   overflow: hidden;
   margin: 8px 0;
-  border: 2px solid rgba(0,0,0,0.08);
+  border: 2px solid rgba(0, 0, 0, 0.08);
 }
 
 .budget-fill {
@@ -767,8 +797,8 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-size: 1.2rem;
   flex-shrink: 0;
-  border: 3px solid rgba(0,0,0,0.1);
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .step-content h3 {
@@ -791,13 +821,11 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
   border-top: 4px solid var(--primary);
   /* Stripe pattern */
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 20px,
-    rgba(255,255,255,0.015) 20px,
-    rgba(255,255,255,0.015) 40px
-  );
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 20px,
+      rgba(255, 255, 255, 0.015) 20px,
+      rgba(255, 255, 255, 0.015) 40px);
   background-color: var(--bg-dark);
 }
 
@@ -872,7 +900,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== EMPTY STATE ===== */
@@ -902,20 +932,18 @@ h1, h2, h3, h4, h5, h6 {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 15px,
-    rgba(255,255,255,0.05) 15px,
-    rgba(255,255,255,0.05) 30px
-  );
+  background: repeating-linear-gradient(-45deg,
+      transparent,
+      transparent 15px,
+      rgba(255, 255, 255, 0.05) 15px,
+      rgba(255, 255, 255, 0.05) 30px);
 }
 
 .page-header h1 {
   font-size: 2.2rem;
   margin-bottom: 8px;
   position: relative;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .page-header p {
@@ -955,7 +983,9 @@ h1, h2, h3, h4, h5, h6 {
     padding: 50px 20px;
   }
 
-  .grid-2, .grid-3, .grid-4 {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -989,7 +1019,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 480px) {
-  .grid-2, .grid-3, .grid-4 {
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
     grid-template-columns: 1fr;
   }
 
@@ -1002,93 +1035,94 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
   }
 }
+
 /* ================================================
    RESPONSIVE QUERIES
    ================================================ */
 
 @media (max-width: 768px) {
 
-    /* Layout Adjustments */
-    .container {
-        padding: 0 16px;
-    }
+  /* Layout Adjustments */
+  .container {
+    padding: 0 16px;
+  }
 
-    /* Navbar */
-    .navbar-inner {
-        height: 60px;
-    }
+  /* Navbar */
+  .navbar-inner {
+    height: 60px;
+  }
 
-    .navbar-links,
-    .navbar-user {
-        display: none;
-    }
+  .navbar-links,
+  .navbar-user {
+    display: none;
+  }
 
-    .hamburger {
-        display: block;
-        color: var(--secondary);
-    }
+  .hamburger {
+    display: block;
+    color: var(--secondary);
+  }
 
-    /* Grid Stacking */
-    .grid-2,
-    .grid-3,
-    .grid-4 {
-        grid-template-columns: 1fr;
-    }
+  /* Grid Stacking */
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
 
-    .admin-grid {
-        grid-template-columns: 1fr;
-    }
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
 
-    /* Typography & Hero */
-    .hero-title {
-        font-size: 2.2rem;
-    }
+  /* Typography & Hero */
+  .hero-title {
+    font-size: 2.2rem;
+  }
 
-    .hero-buttons {
-        flex-direction: column;
-        width: 100%;
-        gap: 12px;
-    }
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
 
-    .hero-buttons .btn {
-        width: 100%;
-    }
+  .hero-buttons .btn {
+    width: 100%;
+  }
 
-    /* Components */
-    .steps .step {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
+  /* Components */
+  .steps .step {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 
-    .step-number {
-        margin-bottom: 12px;
-    }
+  .step-number {
+    margin-bottom: 12px;
+  }
 
-    .card {
-        padding: 20px;
-    }
+  .card {
+    padding: 20px;
+  }
 
-    .leaderboard-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
+  .leaderboard-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 
-    .leaderboard-rank {
-        margin-bottom: 4px;
-    }
+  .leaderboard-rank {
+    margin-bottom: 4px;
+  }
 
-    .leaderboard-info {
-        width: 100%;
-    }
+  .leaderboard-info {
+    width: 100%;
+  }
 
-    .leaderboard-score {
-        align-self: flex-end;
-    }
+  .leaderboard-score {
+    align-self: flex-end;
+  }
 
-    /* Footer */
-    .footer {
-        padding: 30px 20px;
-    }
+  /* Footer */
+  .footer {
+    padding: 30px 20px;
+  }
 }

@@ -40,7 +40,7 @@ export default function AdminPage() {
 
     const fetchData = async () => {
         try {
-            const [compRes, bmRes, scoreRes, annRes] = await Promise.all([
+            const [compRes, bmRes, scoreRes, annRes, usersRes] = await Promise.all([
                 fetch('/api/competitors'),
                 fetch('/api/bonus-malus'),
                 fetch('/api/scores'),

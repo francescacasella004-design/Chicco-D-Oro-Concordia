@@ -23,7 +23,7 @@ export default function AdminPage() {
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
-    const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
+
     const [showEditModal, setShowEditModal] = useState(false);
     const [viewingTeam, setViewingTeam] = useState(null); // { userName: string, teamName: string, competitors: [] }
 

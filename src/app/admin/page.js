@@ -369,7 +369,6 @@ export default function AdminPage() {
                                         <button
                                             className="btn btn-sm btn-secondary"
                                             onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails })}
-                                            disabled={!u.teamDetails || u.teamDetails.length === 0}
                                             title="Vedi Squadra"
                                         >
                                             👁️ Vedi Squadra

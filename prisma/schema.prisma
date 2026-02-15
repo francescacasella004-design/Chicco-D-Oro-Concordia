@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("player")
+  createdAt    DateTime @default(now())
+  team         Team?
+  scoreEvents  ScoreEvent[] @relation("AssignedBy")
+}
+
+model Competitor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  cost      Int      @default(10)
+  imageUrl  String?
+  teams     TeamCompetitor[]
+  captainOf Team[]   @relation("Captain")
+  scores    ScoreEvent[]
+}
+
+model Team {
+  id          Int              @id @default(autoincrement())
+  name        String
+  userId      Int              @unique
+  user        User             @relation(fields: [userId], references: [id])
+  captainId   Int?
+  captain     Competitor?      @relation("Captain", fields: [captainId], references: [id])
+  competitors TeamCompetitor[]
+  createdAt   DateTime         @default(now())
+}
+
+model TeamCompetitor {
+  id           Int        @id @default(autoincrement())
+  teamId       Int
+  team         Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  competitorId Int
+  competitor   Competitor @relation(fields: [competitorId], references: [id])
+
+  @@unique([teamId, competitorId])
+}
+
+model BonusMalus {
+  id          Int          @id @default(autoincrement())
+  description String
+  points      Int
+  category    String
+  scoreEvents ScoreEvent[]
+}
+
+model ScoreEvent {
+  id            Int        @id @default(autoincrement())
+  competitorId  Int
+  competitor    Competitor @relation(fields: [competitorId], references: [id])
+  bonusMalusId  Int
+  bonusMalus    BonusMalus @relation(fields: [bonusMalusId], references: [id])
+  assignedById  Int
+  assignedBy    User       @relation("AssignedBy", fields: [assignedById], references: [id])
+  createdAt     DateTime   @default(now())
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+

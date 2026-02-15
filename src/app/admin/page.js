@@ -368,7 +368,7 @@ export default function AdminPage() {
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         <button
                                             className="btn btn-sm btn-secondary"
-                                            onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails })}
+                                            onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails || [] })}
                                             title="Vedi Squadra"
                                         >
                                             👁️ Vedi Squadra
@@ -453,7 +453,7 @@ export default function AdminPage() {
                         <p style={{ marginBottom: 16, color: 'var(--text-light)' }}>Allenatore: <strong>{viewingTeam.userName}</strong></p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {viewingTeam.competitors.length > 0 ? viewingTeam.competitors.map(c => (
+                            {(viewingTeam.competitors && viewingTeam.competitors.length > 0) ? viewingTeam.competitors.map(c => (
                                 <div key={c.id} style={{
                                     padding: '8px 12px',
                                     background: 'var(--background)',

@@ -15,9 +15,19 @@ const spaceGrotesk = Space_Grotesk({
   variable: '--font-body',
 });
 
+export const viewport = {
+  themeColor: "#E8531E",
+};
+
 export const metadata = {
   title: 'Fantachicco – Il Fantasy Game della Parrocchia',
   description: 'Gioca al Fantachicco! Scegli la tua squadra, segui le esibizioni e scala la classifica. Un gioco ispirato al Fantasanremo per la Parrocchia Santa Maria del Carmelo alla Concordia.',
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Fantachicco",
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -23,7 +23,9 @@ export default function AdminPage() {
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
+    const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
     const [showEditModal, setShowEditModal] = useState(false);
+    const [viewingTeam, setViewingTeam] = useState(null); // { userName: string, teamName: string, competitors: [] }
 
     // New Item State
     const [newCompetitor, setNewCompetitor] = useState({ name: '', type: 'bambino', cost: 10, imageUrl: '' });
@@ -363,14 +365,24 @@ export default function AdminPage() {
                                         <div style={{ fontSize: '0.9em' }}>📧 {u.email}</div>
                                         <div style={{ fontSize: '0.9em' }}>🏆 Squadra: <strong>{u.teamName}</strong></div>
                                     </div>
-                                    <button
-                                        className="btn btn-sm btn-danger"
-                                        onClick={() => handleDelete('user', u.id)}
-                                        disabled={u.role === 'admin' || u.scoresAssignedCount > 0}
-                                        title={u.scoresAssignedCount > 0 ? "Non puoi eliminare chi ha assegnato punteggi" : "Elimina Utente"}
-                                    >
-                                        🗑️
-                                    </button>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <button
+                                            className="btn btn-sm btn-secondary"
+                                            onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails })}
+                                            disabled={!u.teamDetails || u.teamDetails.length === 0}
+                                            title="Vedi Squadra"
+                                        >
+                                            👁️ Vedi Squadra
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-danger"
+                                            onClick={() => handleDelete('user', u.id)}
+                                            disabled={u.role === 'admin' || u.scoresAssignedCount > 0}
+                                            title={u.scoresAssignedCount > 0 ? "Non puoi eliminare chi ha assegnato punteggi" : "Elimina Utente"}
+                                        >
+                                            🗑️
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                             {users.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>Nessun utente registrato</div>}
@@ -427,6 +439,46 @@ export default function AdminPage() {
                     </div>
                 )
             }
+
+            {/* === VIEW TEAM MODAL === */}
+            {viewingTeam && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                }}>
+                    <div className="card" style={{ width: '90%', maxWidth: 500, maxHeight: '80vh', overflowY: 'auto' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                            <h2 className="card-title" style={{ margin: 0 }}>🏆 {viewingTeam.teamName}</h2>
+                            <button className="btn btn-sm btn-secondary" onClick={() => setViewingTeam(null)}>✕</button>
+                        </div>
+                        <p style={{ marginBottom: 16, color: 'var(--text-light)' }}>Allenatore: <strong>{viewingTeam.userName}</strong></p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {viewingTeam.competitors.length > 0 ? viewingTeam.competitors.map(c => (
+                                <div key={c.id} style={{
+                                    padding: '8px 12px',
+                                    background: 'var(--background)',
+                                    borderRadius: 8,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    border: '1px solid var(--border)'
+                                }}>
+                                    <div>
+                                        <strong>{c.name}</strong>
+                                        <div style={{ fontSize: '0.8em', opacity: 0.7 }}>{c.type}</div>
+                                    </div>
+                                    <div style={{ fontWeight: 'bold' }}>{c.cost} cr</div>
+                                </div>
+                            )) : <p>Nessun giocatore in squadra</p>}
+                        </div>
+
+                        <div style={{ marginTop: 24, textAlign: 'right' }}>
+                            <button className="btn btn-primary" onClick={() => setViewingTeam(null)}>Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }

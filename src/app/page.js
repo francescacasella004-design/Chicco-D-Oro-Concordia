@@ -18,7 +18,7 @@ export default function HomePage() {
     <>
       {/* HERO con Logo */}
       <section className="hero" style={{ minHeight: '50vh' }}>
-        <div style={{ fontSize: '5rem', marginBottom: 8 }}>🌱</div>
+        <img src="/solochicco.png" alt="Chicco D'Oro" style={{ width: 'clamp(80px, 20vw, 140px)', marginBottom: 8 }} />
         <h1 className="hero-title" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)' }}>
           Chicco D&apos;Oro
         </h1>

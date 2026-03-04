@@ -26,8 +26,7 @@ export default function FantachiccoPage() {
         <>
             {/* Hero */}
             <section className="hero" style={{ minHeight: '35vh' }}>
-                <span className="hero-emoji">🎤</span>
-                <h1 className="hero-title">Fantachicco</h1>
+                <img src="/chicco-compl.png" alt="Fantachicco Logo" style={{ width: 'clamp(200px, 40vw, 360px)', marginBottom: 8 }} />
                 <p className="hero-subtitle">
                     Il fantasy game della parrocchia! Scegli i tuoi concorrenti e scala la classifica.
                 </p>

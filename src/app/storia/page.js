@@ -1,7 +1,7 @@
 export default function StoriaPage() {
     return (
         <>
-            <div className="page-header" style={{ background: 'linear-gradient(135deg, #E8531E, #F2C12E)' }}>
+            <div className="page-header" style={{ background: 'linear-gradient(135deg, #1B2A4A, #D4A017)' }}>
                 <h1>📜 La Storia del Chicco D&apos;Oro</h1>
                 <p>Un viaggio attraverso gli anni del nostro evento</p>
             </div>
@@ -10,7 +10,7 @@ export default function StoriaPage() {
                 <div className="container" style={{ maxWidth: 750 }}>
 
                     {/* Introduzione */}
-                    <div className="card" style={{ marginBottom: 32, borderLeft: '4px solid #E8531E' }}>
+                    <div className="card" style={{ marginBottom: 32, borderLeft: '4px solid #D4A017' }}>
                         <h2 style={{ marginBottom: 12 }}>🌾 Come è nato il Chicco D&apos;Oro</h2>
                         <p style={{ color: 'var(--text-light)', lineHeight: 1.9 }}>
                             Il Chicco D&apos;Oro è un evento nato dalla passione e dalla creatività della comunità
@@ -36,21 +36,21 @@ export default function StoriaPage() {
 
                     <div className="steps">
                         <div className="step">
-                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #E8531E, #F2C12E)' }}>1</div>
+                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #1B2A4A, #D4A017)' }}>1</div>
                             <div className="step-content">
                                 <h3>Prima Edizione</h3>
                                 <p>L&apos;inizio di tutto. Un piccolo palco, tanta emozione e la nascita di una tradizione che dura ancora oggi.</p>
                             </div>
                         </div>
                         <div className="step">
-                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #E8531E, #F2C12E)' }}>2</div>
+                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #1B2A4A, #D4A017)' }}>2</div>
                             <div className="step-content">
                                 <h3>Seconda Edizione</h3>
                                 <p>Più partecipanti, più entusiasmo. L&apos;evento cresce e coinvolge sempre più famiglie della parrocchia.</p>
                             </div>
                         </div>
                         <div className="step">
-                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #E8531E, #F2C12E)' }}>3</div>
+                            <div className="step-number" style={{ background: 'linear-gradient(135deg, #1B2A4A, #D4A017)' }}>3</div>
                             <div className="step-content">
                                 <h3>Terza Edizione</h3>
                                 <p>Nuove idee, nuovi format e la nascita del Fantachicco — il fantasy game che accompagna l&apos;evento!</p>

@@ -31,12 +31,12 @@ export default function FantachiccoPage() {
                     Il fantasy game della parrocchia! Scegli i tuoi concorrenti e scala la classifica.
                 </p>
                 {user ? (
-                    <Link href="/squadra" className="btn btn-lg" style={{ background: 'white', color: '#E8531E' }}>
+                    <Link href="/squadra" className="btn btn-lg" style={{ background: 'white', color: '#D4A017' }}>
                         🎯 La mia squadra
                     </Link>
                 ) : (
                     <div className="hero-buttons">
-                        <Link href="/registrazione" className="btn btn-lg" style={{ background: 'white', color: '#E8531E' }}>
+                        <Link href="/registrazione" className="btn btn-lg" style={{ background: 'white', color: '#D4A017' }}>
                             🚀 Partecipa ora!
                         </Link>
                         <Link href="/login" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', border: '2px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(4px)' }}>

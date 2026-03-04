@@ -1,43 +1,43 @@
 :root {
-  /* === RETRO PALETTE === */
-  --primary: #E8531E;
-  /* Arancio '70s */
-  --primary-light: #F28C5A;
-  --primary-dark: #C43D10;
-  --secondary: #F2C12E;
-  /* Giallo senape */
-  --secondary-light: #FADE8B;
-  --accent: #E6267A;
-  /* Magenta '80s */
-  --accent-light: #FF6EB4;
-  --teal: #00B4A2;
-  /* Teal '90s */
-  --teal-light: #6BDED0;
-  --purple: #7B2D8E;
-  /* Viola disco */
-  --purple-light: #B366CC;
+  /* === RETRO PALETTE — Chicco D'Oro === */
+  --primary: #D4A017;
+  /* Oro chicco */
+  --primary-light: #F5CB5C;
+  --primary-dark: #B8860B;
+  --secondary: #F5B731;
+  /* Giallo corona */
+  --secondary-light: #FADA8E;
+  --accent: #1B2A4A;
+  /* Blu navy logo */
+  --accent-light: #2E4A7A;
+  --teal: #4A90A4;
+  /* Azzurro microfono '80s */
+  --teal-light: #7AB8CC;
+  --purple: #6B3FA0;
+  /* Viola disco '80s */
+  --purple-light: #9B6FD0;
   --success: #4CAF50;
-  --warning: #F2C12E;
+  --warning: #F5B731;
   --danger: #D32F2F;
-  --bg: #FFF8F0;
-  /* Crema caldo retrÃ² */
+  --bg: #FFF9EE;
+  /* Crema caldo vintage */
   --bg-card: #FFFFFF;
-  --bg-dark: #1A1A2E;
-  /* Notte '80s */
-  --text: #1A1A2E;
-  --text-light: #5A5A6E;
-  --text-muted: #9E9EB0;
-  --border: #E8D5C4;
+  --bg-dark: #1B2A4A;
+  /* Blu notte logo */
+  --text: #1B2A4A;
+  --text-light: #4A5568;
+  --text-muted: #8E99A4;
+  --border: #E8D5B8;
   --shadow: 0 4px 0 rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 6px 0 rgba(0, 0, 0, 0.12), 0 10px 40px rgba(0, 0, 0, 0.1);
   --radius: 12px;
   --radius-sm: 8px;
   --radius-full: 50px;
-  --gradient: linear-gradient(135deg, #E8531E, #F2C12E);
-  --gradient-warm: linear-gradient(135deg, #E6267A, #F28C5A);
-  --gradient-hero: linear-gradient(135deg, #E8531E 0%, #F2C12E 40%, #E6267A 100%);
-  --gradient-synthwave: linear-gradient(135deg, #7B2D8E, #E6267A, #F2C12E);
-  --gradient-teal: linear-gradient(135deg, #00B4A2, #F2C12E);
+  --gradient: linear-gradient(135deg, #D4A017, #F5B731);
+  --gradient-warm: linear-gradient(135deg, #B8860B, #F5CB5C);
+  --gradient-hero: linear-gradient(135deg, #1B2A4A 0%, #2E4A7A 40%, #D4A017 100%);
+  --gradient-synthwave: linear-gradient(135deg, #6B3FA0, #D4A017, #F5B731);
+  --gradient-teal: linear-gradient(135deg, #4A90A4, #F5B731);
   --font-heading: 'Righteous', cursive;
   --font-body: 'Space Grotesk', sans-serif;
 }
@@ -607,8 +607,8 @@ h6 {
 
 .leaderboard-item.top-3 {
   background: linear-gradient(135deg, #FBE9E7, #FFFFFF);
-  border-color: #E8531E;
-  box-shadow: 3px 3px 0 #C43D10;
+  border-color: #D4A017;
+  box-shadow: 3px 3px 0 #B8860B;
 }
 
 .leaderboard-rank {

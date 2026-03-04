@@ -24,7 +24,7 @@ export async function sendPasswordResetEmail(email, token) {
     <body style="margin:0;padding:0;background-color:#FFF8F0;font-family:'Segoe UI',Arial,sans-serif;">
         <div style="max-width:500px;margin:40px auto;padding:0 20px;">
             <!-- Header -->
-            <div style="background:linear-gradient(135deg,#E8531E,#F2C12E);border-radius:12px 12px 0 0;padding:30px 24px;text-align:center;">
+            <div style="background:linear-gradient(135deg,#1B2A4A,#D4A017);border-radius:12px 12px 0 0;padding:30px 24px;text-align:center;">
                 <h1 style="margin:0;color:white;font-size:28px;letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,0.15);">
                     🏆 FantaChicco
                 </h1>
@@ -40,7 +40,7 @@ export async function sendPasswordResetEmail(email, token) {
                 </p>
                 <div style="text-align:center;margin:28px 0;">
                     <a href="${resetLink}"
-                       style="display:inline-block;background:#E8531E;color:white;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.5px;border:3px solid #C43D10;box-shadow:0 4px 0 #C43D10;">
+                       style="display:inline-block;background:#D4A017;color:white;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.5px;border:3px solid #B8860B;box-shadow:0 4px 0 #B8860B;">
                         🚀 Reimposta Password
                     </a>
                 </div>

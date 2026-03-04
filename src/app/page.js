@@ -26,7 +26,7 @@ export default function HomePage() {
           L&apos;evento della Parrocchia Concordia
         </p>
         <div className="hero-buttons">
-          <Link href="/fantachicco" className="btn btn-lg" style={{ background: 'white', color: '#E8531E' }}>
+          <Link href="/fantachicco" className="btn btn-lg" style={{ background: 'white', color: '#D4A017' }}>
             🎮 Gioca a Fantachicco
           </Link>
           <Link href="/storia" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', border: '2px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(4px)' }}>

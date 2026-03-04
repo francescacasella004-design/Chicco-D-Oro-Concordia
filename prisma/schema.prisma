@@ -85,3 +85,11 @@ model PushSubscription {
   auth      String
   createdAt DateTime @default(now())
 }
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

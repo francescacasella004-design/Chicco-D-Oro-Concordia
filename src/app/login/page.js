@@ -62,6 +62,11 @@ export default function LoginPage() {
                                     placeholder="La tua password"
                                     required
                                 />
+                                <div style={{ textAlign: 'right', marginTop: 8 }}>
+                                    <Link href="/password-dimenticata" style={{ color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600 }}>
+                                        Password dimenticata?
+                                    </Link>
+                                </div>
                             </div>
                             <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
                                 {loading ? 'Accesso in corso...' : '🚀 Accedi'}

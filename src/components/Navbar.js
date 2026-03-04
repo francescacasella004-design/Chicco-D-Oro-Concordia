@@ -23,7 +23,7 @@ export default function Navbar() {
         <>
             <nav className="navbar">
                 <div className="navbar-inner">
-                    <Link href="/" className="navbar-logo">🌾 Chicco D&apos;Oro</Link>
+                    <Link href="/" className="navbar-logo">🌱 Chicco D&apos;Oro</Link>
 
                     <ul className="navbar-links">
                         {links.map(l => (

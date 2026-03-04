@@ -18,12 +18,12 @@ export default function HomePage() {
     <>
       {/* HERO con Logo */}
       <section className="hero" style={{ minHeight: '50vh' }}>
-        <div style={{ fontSize: '5rem', marginBottom: 8 }}>🌾</div>
+        <div style={{ fontSize: '5rem', marginBottom: 8 }}>🌱</div>
         <h1 className="hero-title" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)' }}>
           Chicco D&apos;Oro
         </h1>
         <p className="hero-subtitle" style={{ maxWidth: 520 }}>
-          L&apos;evento della Parrocchia Santa Maria del Carmelo alla Concordia
+          L&apos;evento della Parrocchia Concordia
         </p>
         <div className="hero-buttons">
           <Link href="/fantachicco" className="btn btn-lg" style={{ background: 'white', color: '#E8531E' }}>
@@ -32,6 +32,28 @@ export default function HomePage() {
           <Link href="/storia" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', border: '2px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(4px)' }}>
             📜 La nostra storia
           </Link>
+        </div>
+      </section>
+
+      {/* DATA EVENTO CONFERMATA */}
+      <section className="section" style={{ background: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' }}>
+        <div className="container" style={{ maxWidth: 700, textAlign: 'center' }}>
+          <h2 className="section-title">📅 Data Evento Confermata</h2>
+          <div className="card" style={{ padding: '32px 24px', borderLeft: '4px solid var(--primary)' }}>
+            <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-light)', margin: 0 }}>
+              L&apos;evento del <strong>Chicco D&apos;Oro</strong> si terrà il <strong>2 e 3 Maggio</strong> presso
+              il <strong>Teatro Politeama di Napoli</strong>.
+            </p>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Teatro+Politeama+Napoli+Via+Monte+di+Dio+80+Napoli"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-lg"
+              style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
+              📍 Come arrivare
+            </a>
+          </div>
         </div>
       </section>
 

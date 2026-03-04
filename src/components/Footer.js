@@ -5,7 +5,7 @@ export default function Footer() {
         <footer className="footer">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
                 <img src="/solochicco.png" alt="Chicco" style={{ height: 40, width: 'auto' }} />
-                <span className="footer-title" style={{ marginBottom: 0 }}>Chicco D&apos;Oro</span>
+                <span className="footer-title" style={{ marginBottom: 0, background: 'linear-gradient(180deg, #F5B731, #D4A017)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: 'none' }}>Chicco D&apos;Oro</span>
             </div>
             <p>Parrocchia Concordia</p>
             <div className="footer-links">

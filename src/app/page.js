@@ -35,28 +35,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* DATA EVENTO CONFERMATA */}
-      <section className="section" style={{ background: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' }}>
-        <div className="container" style={{ maxWidth: 700, textAlign: 'center' }}>
-          <h2 className="section-title">📅 Data Evento Confermata</h2>
-          <div className="card" style={{ padding: '32px 24px', borderLeft: '4px solid var(--primary)' }}>
-            <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-light)', margin: 0 }}>
-              L&apos;evento del <strong>Chicco D&apos;Oro</strong> si terrà il <strong>2 e 3 Maggio</strong> presso
-              il <strong>Teatro Politeama di Napoli</strong>.
-            </p>
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=Teatro+Politeama+Napoli+Via+Monte+di+Dio+80+Napoli"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-lg"
-              style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 8 }}
-            >
-              📍 Come arrivare
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* AVVISI */}
       <section className="section">
         <div className="container" style={{ maxWidth: 700 }}>
@@ -95,6 +73,28 @@ export default function HomePage() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* DATA EVENTO CONFERMATA */}
+      <section className="section" style={{ background: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' }}>
+        <div className="container" style={{ maxWidth: 700, textAlign: 'center' }}>
+          <h2 className="section-title">📅 Data Evento Confermata</h2>
+          <div className="card" style={{ padding: '32px 24px', borderLeft: '4px solid var(--primary)' }}>
+            <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-light)', margin: 0 }}>
+              L&apos;evento del <strong>Chicco D&apos;Oro</strong> si terrà il <strong>2 e 3 Maggio</strong> presso
+              il <strong>Teatro Politeama di Napoli</strong>.
+            </p>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Teatro+Politeama+Napoli+Via+Monte+di+Dio+80+Napoli"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-lg"
+              style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
+              📍 Come arrivare
+            </a>
+          </div>
         </div>
       </section>
 

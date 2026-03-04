@@ -23,7 +23,10 @@ export default function Navbar() {
         <>
             <nav className="navbar">
                 <div className="navbar-inner">
-                    <Link href="/" className="navbar-logo">🌱 Chicco D&apos;Oro</Link>
+                    <Link href="/" className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <img src="/solochicco.png" alt="Chicco" style={{ height: 36, width: 'auto' }} />
+                        <span style={{ background: 'linear-gradient(180deg, #F5B731, #D4A017)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: 'none' }}>Chicco D&apos;Oro</span>
+                    </Link>
 
                     <ul className="navbar-links">
                         {links.map(l => (

@@ -3,8 +3,11 @@ import Link from 'next/link';
 export default function Footer() {
     return (
         <footer className="footer">
-            <div className="footer-title">🌾 Chicco D&apos;Oro</div>
-            <p>Parocchia Santa Maria del Carmelo alla Concordia</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
+                <img src="/solochicco.png" alt="Chicco" style={{ height: 40, width: 'auto' }} />
+                <span className="footer-title" style={{ marginBottom: 0 }}>Chicco D&apos;Oro</span>
+            </div>
+            <p>Parrocchia Concordia</p>
             <div className="footer-links">
                 <Link href="/">Home</Link>
                 <Link href="/fantachicco">Fantachicco</Link>

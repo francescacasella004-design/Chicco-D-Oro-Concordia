@@ -29,9 +29,6 @@ export default function HomePage() {
           <Link href="/fantachicco" className="btn btn-lg" style={{ background: 'white', color: '#D4A017' }}>
             🎮 Gioca a Fantachicco
           </Link>
-          <Link href="/storia" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', border: '2px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(4px)' }}>
-            📜 La nostra storia
-          </Link>
         </div>
       </section>
 

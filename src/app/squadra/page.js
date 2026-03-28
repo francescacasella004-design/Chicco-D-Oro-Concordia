@@ -118,6 +118,7 @@ export default function SquadraPage() {
 
     const bambini = competitors.filter(c => c.type === 'bambino');
     const animatori = competitors.filter(c => c.type === 'animatore');
+    const capiAnimatori = competitors.filter(c => c.type === 'capo_animatore');
 
     return (
         <>
@@ -233,6 +234,37 @@ export default function SquadraPage() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Capi Animatori */}
+                            {capiAnimatori.length > 0 && (
+                                <>
+                                    <h2 style={{ marginBottom: 16, fontSize: '1.4rem' }}>⭐ Capi Animatori</h2>
+                                    <div className="grid grid-3" style={{ marginBottom: 32 }}>
+                                        {capiAnimatori.map(c => (
+                                            <div
+                                                key={c.id}
+                                                className={`competitor-card ${selectedIds.includes(c.id) ? 'selected' : ''} ${captainId === c.id ? 'captain' : ''}`}
+                                                onClick={() => toggleCompetitor(c.id)}
+                                            >
+                                                {captainId === c.id && <div className="competitor-badge">👑</div>}
+                                                <div className="competitor-avatar" style={{ background: 'linear-gradient(135deg, #F5B731, #D4A017)' }}>{c.name.charAt(0)}</div>
+                                                <div className="competitor-name">{c.name}</div>
+                                                <div className="competitor-type">capo animatore</div>
+                                                <div className="competitor-cost">{c.cost} Chicchi</div>
+                                                {selectedIds.includes(c.id) && captainId !== c.id && (
+                                                    <button
+                                                        className="btn btn-sm btn-accent"
+                                                        style={{ marginTop: 8, width: '100%' }}
+                                                        onClick={(e) => { e.stopPropagation(); setCaptainId(c.id); }}
+                                                    >
+                                                        👑 Fai capitano
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
 
                             {/* Save */}
                             <div style={{ textAlign: 'center', marginBottom: 40 }}>

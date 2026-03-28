@@ -102,7 +102,7 @@ function InfoSection({ user }) {
                         <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>👥</div>
                         <h3 style={{ marginBottom: 8 }}>Scegli la squadra</h3>
                         <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>
-                            Seleziona 5 concorrenti tra bambini e animatori, rispettando il budget.
+                            Seleziona 5 concorrenti tra bambini, animatori e capi animatori, rispettando il budget.
                         </p>
                     </div>
                     <div className="card" style={{ textAlign: 'center' }}>
@@ -154,7 +154,7 @@ function ComeSiGiocaSection() {
                         <div className="step-number">2</div>
                         <div className="step-content">
                             <h3>Forma la tua squadra</h3>
-                            <p>Hai un budget di <strong>100 crediti</strong> per scegliere <strong>5 concorrenti</strong> tra bambini e animatori. Ogni concorrente ha un costo diverso!</p>
+                            <p>Hai un budget di <strong>100 crediti</strong> per scegliere <strong>5 concorrenti</strong> tra bambini, animatori e capi animatori. Ogni concorrente ha un costo diverso!</p>
                         </div>
                     </div>
                     <div className="step">
@@ -184,7 +184,7 @@ function ComeSiGiocaSection() {
                     <h3 style={{ marginBottom: 8 }}>💡 Consigli strategici</h3>
                     <ul style={{ textAlign: 'left', paddingLeft: 20, color: 'var(--text-light)', lineHeight: 2 }}>
                         <li>Non spendere tutto il budget su pochi concorrenti costosi</li>
-                        <li>Mischia bambini e animatori per una squadra equilibrata</li>
+                        <li>Mischia bambini, animatori e capi animatori per una squadra equilibrata</li>
                         <li>Il capitano giusto può fare tutta la differenza!</li>
                         <li>Guarda le regole per capire come si guadagnano i punti</li>
                     </ul>

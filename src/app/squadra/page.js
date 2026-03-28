@@ -67,7 +67,28 @@ export default function SquadraPage() {
                 showFeedback('error', 'Attenzione', 'Puoi selezionare massimo 5 concorrenti!');
                 return;
             }
-            const newCost = totalCost + competitors.find(c => c.id === id).cost;
+
+            const compToAdd = competitors.find(c => c.id === id);
+            const selectedComps = competitors.filter(c => selectedIds.includes(c.id));
+
+            const numBambini = selectedComps.filter(c => c.type === 'bambino').length;
+            const numAnimatori = selectedComps.filter(c => c.type === 'animatore').length;
+            const numCapi = selectedComps.filter(c => c.type === 'capo_animatore').length;
+
+            if (compToAdd.type === 'bambino' && numBambini >= 3) {
+                showFeedback('error', 'Limite Raggiunto', 'Puoi selezionare al massimo 3 bambini!');
+                return;
+            }
+            if (compToAdd.type === 'animatore' && numAnimatori >= 1) {
+                showFeedback('error', 'Limite Raggiunto', 'Puoi selezionare al massimo 1 animatore!');
+                return;
+            }
+            if (compToAdd.type === 'capo_animatore' && numCapi >= 1) {
+                showFeedback('error', 'Limite Raggiunto', 'Puoi selezionare al massimo 1 capo animatore!');
+                return;
+            }
+
+            const newCost = totalCost + compToAdd.cost;
             if (newCost > BUDGET) {
                 showFeedback('error', 'Budget Superato', 'Non hai abbastanza Chicchi!');
                 return;

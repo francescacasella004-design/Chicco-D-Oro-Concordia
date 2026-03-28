@@ -47,10 +47,21 @@ export async function POST(request) {
             );
         }
 
-        // Check budget
+        // Validate composition and budget
         const competitors = await prisma.competitor.findMany({
             where: { id: { in: competitorIds } },
         });
+
+        const numBambini = competitors.filter(c => c.type === 'bambino').length;
+        const numAnimatori = competitors.filter(c => c.type === 'animatore').length;
+        const numCapi = competitors.filter(c => c.type === 'capo_animatore').length;
+
+        if (numBambini > 3 || numAnimatori > 1 || numCapi > 1) {
+            return NextResponse.json(
+                { error: 'La squadra deve avere massimo 3 bambini, 1 animatore e 1 capo animatore' },
+                { status: 400 }
+            );
+        }
 
         const totalCost = competitors.reduce((sum, c) => sum + c.cost, 0);
         const BUDGET = 100;

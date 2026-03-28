@@ -106,9 +106,7 @@ export default function AdminPage() {
             });
             if (res.ok) {
                 showMessage('success', 'Punteggio assegnato!');
-                setSelectedBonusMalus('');
-                setScoreType('bonus');
-                setCurrentScoreIndex(prev => prev + 1); // Auto-advance
+                // rimosso reset di selectedBonusMalus e scoreType per permettere assegnazioni multiple
                 fetchData(); // Refresh history
             } else {
                 const data = await res.json();
@@ -350,7 +348,7 @@ export default function AdminPage() {
                                     disabled={loading || !selectedBonusMalus}
                                     style={{ width: '100%', marginTop: 16 }}
                                 >
-                                    {loading ? 'Assegnazione...' : `Conferma e Vai al Prossimo`}
+                                    {loading ? 'Assegnazione...' : `Assegna Punteggio`}
                                 </button>
                             </>
                         ) : (

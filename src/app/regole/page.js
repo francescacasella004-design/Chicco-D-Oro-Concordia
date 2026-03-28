@@ -24,15 +24,8 @@ export default function RegolePage() {
         return <div className="loading"><div className="spinner"></div></div>;
     }
 
-    const categories = [...new Set(bonusMalus.map(bm => bm.category))];
-    const categoryLabels = {
-        base: '⭐ Base',
-        pubblico: '👏 Pubblico',
-        speciale: '🌟 Speciale',
-        stile: '👗 Stile',
-        intrattenimento: '🎭 Intrattenimento',
-        errore: '❌ Errore',
-    };
+    const bonusList = bonusMalus.filter(bm => bm.points >= 0).sort((a, b) => b.points - a.points);
+    const malusList = bonusMalus.filter(bm => bm.points < 0).sort((a, b) => a.points - b.points);
 
     return (
         <>
@@ -41,7 +34,7 @@ export default function RegolePage() {
                 <p>Tutti i bonus e malus del Fantachicco</p>
             </div>
             <section className="section">
-                <div className="container" style={{ maxWidth: 700 }}>
+                <div className="container" style={{ maxWidth: 900 }}>
                     {/* General Rules */}
                     <div className="card" style={{ marginBottom: 24 }}>
                         <h2 className="card-title">🎮 Come funziona il punteggio</h2>
@@ -54,22 +47,48 @@ export default function RegolePage() {
                         </ul>
                     </div>
 
-                    {/* Bonus/Malus by category */}
-                    {categories.map(cat => (
-                        <div key={cat} className="card" style={{ marginBottom: 16 }}>
-                            <h3 style={{ marginBottom: 16 }}>{categoryLabels[cat] || cat}</h3>
-                            {bonusMalus
-                                .filter(bm => bm.category === cat)
-                                .map(bm => (
-                                    <div key={bm.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-                                        <span style={{ fontSize: '0.95rem' }}>{bm.description}</span>
-                                        <span className={`tag ${bm.points >= 0 ? 'tag-bonus' : 'tag-malus'}`}>
-                                            {bm.points > 0 ? '+' : ''}{bm.points} pt
-                                        </span>
-                                    </div>
-                                ))}
+                    {/* Two-column Bonus / Malus */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                        {/* BONUS */}
+                        <div className="card" style={{ borderTop: '4px solid var(--success)' }}>
+                            <h3 style={{ marginBottom: 16, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: '1.5rem' }}>✅</span> Bonus
+                            </h3>
+                            {bonusList.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun bonus definito</p>
+                            ) : bonusList.map(bm => (
+                                <div key={bm.id} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{bm.description}</span>
+                                    <span className="tag tag-bonus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                        +{bm.points} pt
+                                    </span>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+
+                        {/* MALUS */}
+                        <div className="card" style={{ borderTop: '4px solid var(--danger)' }}>
+                            <h3 style={{ marginBottom: 16, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: '1.5rem' }}>❌</span> Malus
+                            </h3>
+                            {malusList.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun malus definito</p>
+                            ) : malusList.map(bm => (
+                                <div key={bm.id} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{bm.description}</span>
+                                    <span className="tag tag-malus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                        {bm.points} pt
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
         </>

@@ -312,11 +312,12 @@ function RegoleSection() {
             .finally(() => setLoading(false));
     }, []);
 
-    const categories = [...new Set(rules.map(r => r.category))];
+    const bonusList = rules.filter(r => r.points >= 0).sort((a, b) => b.points - a.points);
+    const malusList = rules.filter(r => r.points < 0).sort((a, b) => a.points - b.points);
 
     return (
         <section className="section">
-            <div className="container" style={{ maxWidth: 700 }}>
+            <div className="container" style={{ maxWidth: 900 }}>
                 <h2 className="section-title">📋 Regole e Punteggi</h2>
                 <p className="section-subtitle">Ecco come si guadagnano (o perdono) i punti</p>
 
@@ -333,27 +334,49 @@ function RegoleSection() {
 
                 {loading ? (
                     <div className="loading"><div className="spinner"></div></div>
-                ) : categories.map(cat => (
-                    <div key={cat} className="card" style={{ marginBottom: 16 }}>
-                        <h3 style={{ marginBottom: 12, textTransform: 'capitalize' }}>
-                            {cat === 'base' && '🎵 '}
-                            {cat === 'pubblico' && '👏 '}
-                            {cat === 'speciale' && '⭐ '}
-                            {cat === 'stile' && '👗 '}
-                            {cat === 'intrattenimento' && '🎭 '}
-                            {cat === 'errore' && '❌ '}
-                            {cat}
-                        </h3>
-                        {rules.filter(r => r.category === cat).map(r => (
-                            <div key={r.id} className="score-history-item">
-                                <span>{r.description}</span>
-                                <span className={`tag ${r.points >= 0 ? 'tag-bonus' : 'tag-malus'}`}>
-                                    {r.points > 0 ? '+' : ''}{r.points} pt
-                                </span>
-                            </div>
-                        ))}
+                ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                        {/* BONUS */}
+                        <div className="card" style={{ borderTop: '4px solid var(--success)' }}>
+                            <h3 style={{ marginBottom: 16, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: '1.5rem' }}>✅</span> Bonus
+                            </h3>
+                            {bonusList.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun bonus definito</p>
+                            ) : bonusList.map(r => (
+                                <div key={r.id} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{r.description}</span>
+                                    <span className="tag tag-bonus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                        +{r.points} pt
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* MALUS */}
+                        <div className="card" style={{ borderTop: '4px solid var(--danger)' }}>
+                            <h3 style={{ marginBottom: 16, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: '1.5rem' }}>❌</span> Malus
+                            </h3>
+                            {malusList.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun malus definito</p>
+                            ) : malusList.map(r => (
+                                <div key={r.id} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{r.description}</span>
+                                    <span className="tag tag-malus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                        {r.points} pt
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                ))}
+                )}
             </div>
         </section>
     );

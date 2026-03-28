@@ -262,6 +262,7 @@ export default function AdminPage() {
                             <select className="form-input" value={newCompetitor.type} onChange={e => setNewCompetitor({ ...newCompetitor, type: e.target.value })}>
                                 <option value="bambino">Bambino</option>
                                 <option value="animatore">Animatore</option>
+                                <option value="capo_animatore">Capo Animatore</option>
                             </select>
                             <input className="form-input" type="number" placeholder="Costo" value={newCompetitor.cost} onChange={e => setNewCompetitor({ ...newCompetitor, cost: parseInt(e.target.value) })} />
                             <button className="btn btn-primary" onClick={() => handleCreate('competitor')}>Aggiungi</button>
@@ -406,6 +407,7 @@ export default function AdminPage() {
                                     <select className="form-input" value={editingItem.data.type} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, type: e.target.value } })}>
                                         <option value="bambino">Bambino</option>
                                         <option value="animatore">Animatore</option>
+                                        <option value="capo_animatore">Capo Animatore</option>
                                     </select>
                                     <input className="form-input" type="number" value={editingItem.data.cost} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, cost: parseInt(e.target.value) } })} placeholder="Costo" />
                                 </div>

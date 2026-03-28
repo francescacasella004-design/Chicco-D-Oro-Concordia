@@ -18,6 +18,7 @@ export default function AdminPage() {
     // Form State
     const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedBonusMalus, setSelectedBonusMalus] = useState('');
+    const [scoreType, setScoreType] = useState('bonus'); // 'bonus' or 'malus'
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
     const [registrationOpen, setRegistrationOpen] = useState(true);
@@ -106,6 +107,7 @@ export default function AdminPage() {
                 showMessage('success', 'Punteggio assegnato!');
                 setSelectedCompetitor('');
                 setSelectedBonusMalus('');
+                setScoreType('bonus');
                 fetchData(); // Refresh history
             } else {
                 const data = await res.json();
@@ -260,12 +262,36 @@ export default function AdminPage() {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Bonus / Malus</label>
+                                <label className="form-label">Tipo di Punteggio</label>
+                                <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
+                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <input
+                                            type="radio"
+                                            name="scoreType"
+                                            value="bonus"
+                                            checked={scoreType === 'bonus'}
+                                            onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
+                                        />
+                                        Bonus (+ punti)
+                                    </label>
+                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <input
+                                            type="radio"
+                                            name="scoreType"
+                                            value="malus"
+                                            checked={scoreType === 'malus'}
+                                            onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
+                                        />
+                                        Malus (- punti)
+                                    </label>
+                                </div>
                                 <select className="admin-select" value={selectedBonusMalus} onChange={(e) => setSelectedBonusMalus(e.target.value)}>
-                                    <option value="">Seleziona...</option>
-                                    {bonusMalus.map(bm => (
-                                        <option key={bm.id} value={bm.id}>{bm.points > 0 ? '+' : ''}{bm.points} - {bm.description}</option>
-                                    ))}
+                                    <option value="">Seleziona {scoreType === 'bonus' ? 'un bonus' : 'un malus'}...</option>
+                                    {bonusMalus
+                                        .filter(bm => scoreType === 'bonus' ? bm.points > 0 : bm.points < 0)
+                                        .map(bm => (
+                                            <option key={bm.id} value={bm.id}>{bm.points > 0 ? '+' : ''}{bm.points} - {bm.description}</option>
+                                        ))}
                                 </select>
                             </div>
                         </div>

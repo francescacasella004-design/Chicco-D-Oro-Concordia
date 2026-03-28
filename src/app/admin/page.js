@@ -258,7 +258,7 @@ export default function AdminPage() {
             <div className="card">
                 {/* === ASSEGNA PUNTEGGI === */}
                 {activeTab === 'assegna' && (
-                    <div>
+                    <div style={{ paddingBottom: '30vh' }}>
                         <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span>✍️ Assegna Punteggio</span>
                             <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 10 }}>

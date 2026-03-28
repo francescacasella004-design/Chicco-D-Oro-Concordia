@@ -76,7 +76,7 @@ export default function HomePage() {
       {/* Info rapida */}
       <section className="section" style={{ background: 'white' }}>
         <div className="container">
-          <div className="grid grid-3">
+          <div className="grid grid-2">
             <div className="card" style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>⛪</div>
               <h3 style={{ marginBottom: 8 }}>L&apos;evento</h3>
@@ -89,13 +89,6 @@ export default function HomePage() {
               <h3 style={{ marginBottom: 8 }}>Fantachicco</h3>
               <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>
                 Il fantasy game dell&apos;evento! Crea la tua squadra e scala la classifica.
-              </p>
-            </div>
-            <div className="card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📜</div>
-              <h3 style={{ marginBottom: 8 }}>La storia</h3>
-              <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>
-                Scopri la storia del Chicco D&apos;Oro dal primo anno ad oggi.
               </p>
             </div>
           </div>

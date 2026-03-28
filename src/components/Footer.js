@@ -11,7 +11,6 @@ export default function Footer() {
             <div className="footer-links">
                 <Link href="/">Home</Link>
                 <Link href="/fantachicco">Fantachicco</Link>
-                <Link href="/storia">La Storia</Link>
                 <Link href="/contatti">Contatti</Link>
             </div>
             <p style={{ marginTop: 20, fontSize: '0.8rem', opacity: 0.5 }}>

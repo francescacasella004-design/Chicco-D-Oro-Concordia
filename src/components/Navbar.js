@@ -10,7 +10,6 @@ export default function Navbar() {
     const links = [
         { href: '/', label: 'Home' },
         { href: '/fantachicco', label: 'Fantachicco' },
-        { href: '/storia', label: 'La Storia' },
         { href: '/contatti', label: 'Contatti' },
     ];
 

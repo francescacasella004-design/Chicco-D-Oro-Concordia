@@ -121,41 +121,6 @@ function InfoSection({ user }) {
                     </div>
                 </div>
 
-                {/* Steps rapidi */}
-                <div style={{ marginTop: 48 }}>
-                    <h2 className="section-title">Come funziona?</h2>
-                    <p className="section-subtitle">In 4 semplici passi</p>
-                    <div className="steps">
-                        <div className="step">
-                            <div className="step-number">1</div>
-                            <div className="step-content">
-                                <h3>Registrati</h3>
-                                <p>Crea il tuo account in pochi secondi</p>
-                            </div>
-                        </div>
-                        <div className="step">
-                            <div className="step-number">2</div>
-                            <div className="step-content">
-                                <h3>Scegli i concorrenti</h3>
-                                <p>Forma la tua squadra di 5 con un budget di 100 crediti</p>
-                            </div>
-                        </div>
-                        <div className="step">
-                            <div className="step-number">3</div>
-                            <div className="step-content">
-                                <h3>Nomina il capitano</h3>
-                                <p>Il capitano fa punti doppi! Scegli con saggezza</p>
-                            </div>
-                        </div>
-                        <div className="step">
-                            <div className="step-number">4</div>
-                            <div className="step-content">
-                                <h3>Goditi lo spettacolo</h3>
-                                <p>Segui l&apos;evento e guarda la classifica aggiornarsi!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* CTA */}
                 <div style={{ textAlign: 'center', marginTop: 40 }}>

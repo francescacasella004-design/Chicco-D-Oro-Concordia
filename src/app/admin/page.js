@@ -20,6 +20,7 @@ export default function AdminPage() {
     const [selectedBonusMalus, setSelectedBonusMalus] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
+    const [registrationOpen, setRegistrationOpen] = useState(true);
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
@@ -42,12 +43,13 @@ export default function AdminPage() {
 
     const fetchData = async () => {
         try {
-            const [compRes, bmRes, scoreRes, annRes, usersRes] = await Promise.all([
+            const [compRes, bmRes, scoreRes, annRes, usersRes, settingsRes] = await Promise.all([
                 fetch('/api/competitors', { cache: 'no-store' }),
                 fetch('/api/bonus-malus', { cache: 'no-store' }),
                 fetch('/api/scores', { cache: 'no-store' }),
                 fetch('/api/announcements', { cache: 'no-store' }),
-                fetch('/api/users', { cache: 'no-store' })
+                fetch('/api/users', { cache: 'no-store' }),
+                fetch('/api/settings', { cache: 'no-store' })
             ]);
 
             if (compRes.ok) { const data = await compRes.json(); setCompetitors(data.competitors || []); }
@@ -55,6 +57,7 @@ export default function AdminPage() {
             if (scoreRes.ok) { const data = await scoreRes.json(); setScoreHistory(data.scoreEvents || []); }
             if (annRes.ok) { const data = await annRes.json(); setAnnouncements(data.announcements || []); }
             if (usersRes.ok) { const data = await usersRes.json(); setUsers(data.users || []); }
+            if (settingsRes.ok) { const data = await settingsRes.json(); setRegistrationOpen(data.registrationOpen); }
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -63,6 +66,25 @@ export default function AdminPage() {
     const showMessage = (type, text) => {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 3000);
+    };
+
+    const handleToggleRegistration = async () => {
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ registrationOpen: !registrationOpen })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setRegistrationOpen(data.registrationOpen);
+                showMessage('success', data.registrationOpen ? 'Iscrizioni Aperte!' : 'Iscrizioni Chiuse!');
+            } else {
+                showMessage('error', 'Errore aggiornamento impostazioni');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        }
     };
 
     const handleAssignScore = async () => {
@@ -198,6 +220,19 @@ export default function AdminPage() {
                     {message.text}
                 </div>
             )}
+
+            <div className="card" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h3 style={{ margin: 0 }}>Stato Iscrizioni</h3>
+                    <p style={{ margin: 0, color: 'var(--text-light)', fontSize: '0.9rem' }}>Permetti agli utenti di creare e modificare le squadre.</p>
+                </div>
+                <button
+                    className={`btn ${registrationOpen ? 'btn-danger' : 'btn-success'}`}
+                    onClick={handleToggleRegistration}
+                >
+                    {registrationOpen ? '🔒 Chiudi Iscrizioni' : '🔓 Apri Iscrizioni'}
+                </button>
+            </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
                 {['assegna', 'concorrenti', 'regole', 'storico', 'avvisi', 'utenti'].map(tab => (

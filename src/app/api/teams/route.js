@@ -47,6 +47,19 @@ export async function POST(request) {
             );
         }
 
+        // Check internal settings
+        let settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+        if (!settings) {
+            settings = await prisma.settings.create({ data: { id: 'global', registrationOpen: true } });
+        }
+
+        if (!settings.registrationOpen) {
+            return NextResponse.json(
+                { error: 'Le modifiche e le iscrizioni alle squadre sono attualmente chiuse.' },
+                { status: 403 }
+            );
+        }
+
         // Validate composition and budget
         const competitors = await prisma.competitor.findMany({
             where: { id: { in: competitorIds } },

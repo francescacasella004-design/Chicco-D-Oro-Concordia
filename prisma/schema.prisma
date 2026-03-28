@@ -94,3 +94,8 @@ model PasswordResetToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+
+model Settings {
+  id               String  @id @default("global")
+  registrationOpen Boolean @default(true)
+}

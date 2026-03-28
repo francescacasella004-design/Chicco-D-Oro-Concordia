@@ -19,6 +19,7 @@ export default function SquadraPage() {
     const [teamImageUrl, setTeamImageUrl] = useState('/solochicco.png');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [registrationOpen, setRegistrationOpen] = useState(true);
 
     const BUDGET = 100;
 
@@ -34,13 +35,17 @@ export default function SquadraPage() {
 
     async function fetchData() {
         try {
-            const [compRes, teamRes] = await Promise.all([
+            const [compRes, teamRes, settingsRes] = await Promise.all([
                 fetch('/api/competitors'),
                 fetch('/api/teams'),
+                fetch('/api/settings')
             ]);
             const compData = await compRes.json();
             const teamData = await teamRes.json();
+            const settingsData = await settingsRes.json();
+
             setCompetitors(compData.competitors || []);
+            setRegistrationOpen(settingsData.registrationOpen !== false);
             if (teamData.team) {
                 setTeam(teamData.team);
                 setTeamName(teamData.team.name);
@@ -181,8 +186,18 @@ export default function SquadraPage() {
             <section className="section">
                 <div className="container">
 
+                    {/* Registration Closed Notice */}
+                    {!registrationOpen && !team && (
+                        <div className="card" style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center', padding: 40, border: '2px solid var(--danger)' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔒</div>
+                            <h2 className="card-title" style={{ justifyContent: 'center' }}>Iscrizioni Chiuse</h2>
+                            <p style={{ color: 'var(--text-muted)' }}>Le iscrizioni e le modifiche alle squadre sono state sospese dall'organizzazione.</p>
+                            <button className="btn btn-secondary" style={{ marginTop: 24 }} onClick={() => router.push('/')}>Torna alla Home</button>
+                        </div>
+                    )}
+
                     {/* STEP 1: TEAM NAME */}
-                    {step === 1 && (
+                    {step === 1 && (registrationOpen || team) && (
                         <div className="card" style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center', padding: 40 }}>
                             <h2 className="card-title" style={{ justifyContent: 'center' }}>Come si chiamerà la tua squadra?</h2>
                             <div className="form-group">
@@ -397,10 +412,15 @@ export default function SquadraPage() {
                                 })}
                             </div>
 
-                            <div style={{ marginTop: 40, textAlign: 'center' }}>
+                            <div style={{ marginTop: 40, textAlign: 'center', display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
                                 <button className="btn btn-secondary" onClick={() => router.push('/fantachicco?tab=classifica')}>
                                     🏆 Vai alla Classifica
                                 </button>
+                                {registrationOpen && (
+                                    <button className="btn btn-outline" onClick={() => setStep(1)}>
+                                        ✏️ Modifica Squadra
+                                    </button>
+                                )}
                             </div>
                         </div>
                     )}

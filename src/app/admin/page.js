@@ -16,9 +16,10 @@ export default function AdminPage() {
     const [users, setUsers] = useState([]);
 
     // Form State
-    const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedBonusMalus, setSelectedBonusMalus] = useState('');
     const [scoreType, setScoreType] = useState('bonus'); // 'bonus' or 'malus'
+    const [scoreListType, setScoreListType] = useState('standard'); // 'standard' or 'capo'
+    const [currentScoreIndex, setCurrentScoreIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
     const [registrationOpen, setRegistrationOpen] = useState(true);
@@ -88,8 +89,8 @@ export default function AdminPage() {
         }
     };
 
-    const handleAssignScore = async () => {
-        if (!selectedCompetitor || !selectedBonusMalus) {
+    const handleAssignScore = async (competitorId) => {
+        if (!competitorId || !selectedBonusMalus) {
             showMessage('error', 'Seleziona concorrente e bonus/malus');
             return;
         }
@@ -99,15 +100,15 @@ export default function AdminPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    competitorId: parseInt(selectedCompetitor),
+                    competitorId: parseInt(competitorId),
                     bonusMalusId: parseInt(selectedBonusMalus),
                 }),
             });
             if (res.ok) {
                 showMessage('success', 'Punteggio assegnato!');
-                setSelectedCompetitor('');
                 setSelectedBonusMalus('');
                 setScoreType('bonus');
+                setCurrentScoreIndex(prev => prev + 1); // Auto-advance
                 fetchData(); // Refresh history
             } else {
                 const data = await res.json();
@@ -210,6 +211,14 @@ export default function AdminPage() {
 
     if (authLoading || (!user || user.role !== 'admin')) return <div className="loading"><div className="spinner"></div></div>;
 
+    const filteredCompetitorsForScoring = competitors
+        .filter(c => scoreListType === 'standard' ? c.type !== 'capo_animatore' : c.type === 'capo_animatore')
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Ensure index is valid when switching lists
+    const validScoreIndex = Math.min(currentScoreIndex, Math.max(0, filteredCompetitorsForScoring.length - 1));
+    const currentCompetitorToScore = filteredCompetitorsForScoring[validScoreIndex];
+
     return (
         <div className="container section">
             <div className="page-header" style={{ marginBottom: 32, borderRadius: 'var(--radius)' }}>
@@ -250,54 +259,105 @@ export default function AdminPage() {
                 {/* === ASSEGNA PUNTEGGI === */}
                 {activeTab === 'assegna' && (
                     <div>
-                        <h2 className="card-title">✍️ Assegna Punteggio</h2>
-                        <div className="admin-grid">
-                            <div className="form-group">
-                                <label className="form-label">Concorrente</label>
-                                <select className="admin-select" value={selectedCompetitor} onChange={(e) => setSelectedCompetitor(e.target.value)}>
-                                    <option value="">Seleziona...</option>
-                                    {competitors.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name} ({c.type})</option>
-                                    ))}
-                                </select>
+                        <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>✍️ Assegna Punteggio</span>
+                            <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 10 }}>
+                                <label style={{ cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        checked={scoreListType === 'standard'}
+                                        onChange={() => { setScoreListType('standard'); setCurrentScoreIndex(0); }}
+                                    /> Bambini/Animatori
+                                </label>
+                                <label style={{ cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        checked={scoreListType === 'capo'}
+                                        onChange={() => { setScoreListType('capo'); setCurrentScoreIndex(0); }}
+                                    /> Capi Animatori
+                                </label>
                             </div>
-                            <div className="form-group">
-                                <label className="form-label">Tipo di Punteggio</label>
-                                <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
-                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                        <input
-                                            type="radio"
-                                            name="scoreType"
-                                            value="bonus"
-                                            checked={scoreType === 'bonus'}
-                                            onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
-                                        />
-                                        Bonus (+ punti)
-                                    </label>
-                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                        <input
-                                            type="radio"
-                                            name="scoreType"
-                                            value="malus"
-                                            checked={scoreType === 'malus'}
-                                            onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
-                                        />
-                                        Malus (- punti)
-                                    </label>
+                        </h2>
+
+                        {currentCompetitorToScore ? (
+                            <>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    background: 'var(--surface)', padding: '24px', borderRadius: '12px', border: '2px solid var(--border)', marginBottom: 24
+                                }}>
+                                    <button
+                                        className="btn btn-secondary"
+                                        disabled={validScoreIndex === 0}
+                                        onClick={() => setCurrentScoreIndex(validScoreIndex - 1)}
+                                    >
+                                        &lt; Prec
+                                    </button>
+
+                                    <div style={{ textAlign: 'center' }}>
+                                        <h3 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--primary)' }}>{currentCompetitorToScore.name}</h3>
+                                        <span className="tag tag-category" style={{ marginTop: 8 }}>{currentCompetitorToScore.type.replace('_', ' ')}</span>
+                                        <div style={{ marginTop: 8, fontSize: '0.85rem', color: 'var(--text-light)' }}>
+                                            {validScoreIndex + 1} di {filteredCompetitorsForScoring.length}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="btn btn-secondary"
+                                        disabled={validScoreIndex === filteredCompetitorsForScoring.length - 1}
+                                        onClick={() => setCurrentScoreIndex(validScoreIndex + 1)}
+                                    >
+                                        Succ &gt;
+                                    </button>
                                 </div>
-                                <select className="admin-select" value={selectedBonusMalus} onChange={(e) => setSelectedBonusMalus(e.target.value)}>
-                                    <option value="">Seleziona {scoreType === 'bonus' ? 'un bonus' : 'un malus'}...</option>
-                                    {bonusMalus
-                                        .filter(bm => scoreType === 'bonus' ? bm.points > 0 : bm.points < 0)
-                                        .map(bm => (
-                                            <option key={bm.id} value={bm.id}>{bm.points > 0 ? '+' : ''}{bm.points} - {bm.description}</option>
-                                        ))}
-                                </select>
+                                <div className="admin-grid" style={{ gridTemplateColumns: '1fr' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Tipo di Punteggio</label>
+                                        <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
+                                            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <input
+                                                    type="radio"
+                                                    name="scoreType"
+                                                    value="bonus"
+                                                    checked={scoreType === 'bonus'}
+                                                    onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
+                                                />
+                                                Bonus (+ punti)
+                                            </label>
+                                            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <input
+                                                    type="radio"
+                                                    name="scoreType"
+                                                    value="malus"
+                                                    checked={scoreType === 'malus'}
+                                                    onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
+                                                />
+                                                Malus (- punti)
+                                            </label>
+                                        </div>
+                                        <select className="admin-select" value={selectedBonusMalus} onChange={(e) => setSelectedBonusMalus(e.target.value)}>
+                                            <option value="">Seleziona {scoreType === 'bonus' ? 'un bonus' : 'un malus'}...</option>
+                                            {bonusMalus
+                                                .filter(bm => scoreType === 'bonus' ? bm.points > 0 : bm.points < 0)
+                                                .map(bm => (
+                                                    <option key={bm.id} value={bm.id}>{bm.points > 0 ? '+' : ''}{bm.points} - {bm.description}</option>
+                                                ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button
+                                    className="btn btn-primary btn-lg"
+                                    onClick={() => handleAssignScore(currentCompetitorToScore.id)}
+                                    disabled={loading || !selectedBonusMalus}
+                                    style={{ width: '100%', marginTop: 16 }}
+                                >
+                                    {loading ? 'Assegnazione...' : `Conferma e Vai al Prossimo`}
+                                </button>
+                            </>
+                        ) : (
+                            <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>
+                                Nessun concorrente trovato in questa lista.
                             </div>
-                        </div>
-                        <button className="btn btn-primary btn-lg" onClick={handleAssignScore} disabled={loading} style={{ width: '100%', marginTop: 16 }}>
-                            {loading ? 'Assegnazione...' : 'Conferma Assegnazione'}
-                        </button>
+                        )}
                     </div>
                 )}
 

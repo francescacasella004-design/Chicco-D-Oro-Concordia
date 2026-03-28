@@ -45,7 +45,7 @@ export default function SquadraPage() {
                 setTeamName(teamData.team.name);
                 setSelectedIds(teamData.team.competitors.map(tc => tc.competitor.id));
                 setCaptainId(teamData.team.captainId);
-                setStep(2); // If team exists, go directly to selection/view
+                setStep(3); // If team exists, go directly to read-only view
             }
         } catch (e) {
             console.error(e);
@@ -125,6 +125,7 @@ export default function SquadraPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
             setTeam(data.team);
+            setStep(3); // Go to read-only view after creation
             showFeedback('success', 'Evviva! 🎉', 'La tua squadra è stata creata con successo!');
         } catch (err) {
             showFeedback('error', 'Errore', err.message);
@@ -299,6 +300,43 @@ export default function SquadraPage() {
                                 </button>
                             </div>
                         </>
+                    )}
+
+                    {/* STEP 3: READ-ONLY VIEW */}
+                    {step === 3 && team && (
+                        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+                            <div className="card" style={{ textAlign: 'center', marginBottom: 32, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white' }}>
+                                <h1 style={{ fontSize: '2.5rem', marginBottom: 8, textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>{team.name}</h1>
+                                <p style={{ opacity: 0.9, fontSize: '1.1rem' }}>La tua squadra ufficiale per il Fantachicco!</p>
+                            </div>
+
+                            <h2 style={{ marginBottom: 16 }}>I tuoi campioni</h2>
+                            <div className="grid grid-3">
+                                {team.competitors.map(tc => {
+                                    const isCaptain = tc.competitor.id === team.captainId;
+                                    return (
+                                        <div key={tc.competitor.id} className={`competitor-card selected ${isCaptain ? 'captain' : ''}`} style={{ cursor: 'default' }}>
+                                            {isCaptain && <div className="competitor-badge" style={{ transform: 'scale(1.2)' }}>👑</div>}
+                                            <div className="competitor-avatar" style={{
+                                                background: tc.competitor.type === 'capo_animatore' ? 'linear-gradient(135deg, #F5B731, #D4A017)' :
+                                                    tc.competitor.type === 'animatore' ? 'var(--gradient-warm)' : 'var(--gradient-primary)'
+                                            }}>
+                                                {tc.competitor.name.charAt(0)}
+                                            </div>
+                                            <div className="competitor-name">{tc.competitor.name}</div>
+                                            <div className="competitor-type">{tc.competitor.type.replace('_', ' ')}</div>
+                                            {isCaptain && <div style={{ marginTop: 8, fontWeight: 'bold', color: 'var(--primary)', fontSize: '0.9rem' }}>CAPITANO (Punti x2)</div>}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div style={{ marginTop: 40, textAlign: 'center' }}>
+                                <button className="btn btn-secondary" onClick={() => router.push('/fantachicco?tab=classifica')}>
+                                    🏆 Vai alla Classifica
+                                </button>
+                            </div>
+                        </div>
                     )}
 
                 </div>

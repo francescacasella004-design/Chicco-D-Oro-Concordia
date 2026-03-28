@@ -16,6 +16,7 @@ export default function SquadraPage() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [captainId, setCaptainId] = useState(null);
     const [teamName, setTeamName] = useState('');
+    const [teamImageUrl, setTeamImageUrl] = useState('/solochicco.png');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -43,6 +44,7 @@ export default function SquadraPage() {
             if (teamData.team) {
                 setTeam(teamData.team);
                 setTeamName(teamData.team.name);
+                setTeamImageUrl(teamData.team.imageUrl || '/solochicco.png');
                 setSelectedIds(teamData.team.competitors.map(tc => tc.competitor.id));
                 setCaptainId(teamData.team.captainId);
                 setStep(3); // If team exists, go directly to read-only view
@@ -120,7 +122,7 @@ export default function SquadraPage() {
             const res = await fetch('/api/teams', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: teamName, competitorIds: selectedIds, captainId }),
+                body: JSON.stringify({ name: teamName, imageUrl: teamImageUrl, competitorIds: selectedIds, captainId }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
@@ -142,6 +144,34 @@ export default function SquadraPage() {
     const animatori = competitors.filter(c => c.type === 'animatore');
     const capiAnimatori = competitors.filter(c => c.type === 'capo_animatore');
 
+    const getEmojiSvgUrl = (emoji) => {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${emoji}</text></svg>`;
+        return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    };
+
+    const presetImages = [
+        { url: '/solochicco.png', label: 'Chicco' },
+        { url: getEmojiSvgUrl('🚀'), label: 'Razzo' },
+        { url: getEmojiSvgUrl('🎤'), label: 'Microfono' },
+        { url: getEmojiSvgUrl('🩰'), label: 'Danza' },
+        { url: getEmojiSvgUrl('🎭'), label: 'Teatro' }
+    ];
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                showFeedback('error', 'File troppo grande', 'L\'immagine deve essere massimo di 2MB.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setTeamImageUrl(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <>
             <div className="page-header">
@@ -153,18 +183,51 @@ export default function SquadraPage() {
 
                     {/* STEP 1: TEAM NAME */}
                     {step === 1 && (
-                        <div className="card" style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center', padding: 40 }}>
+                        <div className="card" style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center', padding: 40 }}>
                             <h2 className="card-title" style={{ justifyContent: 'center' }}>Come si chiamerà la tua squadra?</h2>
                             <div className="form-group">
                                 <input
                                     type="text"
                                     className="form-input"
-                                    style={{ fontSize: '1.2rem', textAlign: 'center' }}
+                                    style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: 24 }}
                                     value={teamName}
                                     onChange={(e) => setTeamName(e.target.value)}
                                     placeholder="Es: I Campioni..."
                                 />
                             </div>
+
+                            <h3 style={{ marginBottom: 16 }}>Scegli il tuo logo</h3>
+                            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
+                                {presetImages.map((img, idx) => (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            width: 70, height: 70, borderRadius: '50%', cursor: 'pointer',
+                                            border: teamImageUrl === img.url ? '4px solid var(--primary)' : '4px solid transparent',
+                                            padding: 4, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        }}
+                                        onClick={() => setTeamImageUrl(img.url)}
+                                        title={img.label}
+                                    >
+                                        <img src={img.url} alt={img.label} style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '50%' }} />
+                                    </div>
+                                ))}
+                                {/* Custom Upload Info */}
+                                <div style={{ width: '100%', marginTop: 16 }}>
+                                    <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
+                                        📷 Carica tua immagine...
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                                    </label>
+                                </div>
+                            </div>
+
+                            {teamImageUrl && (
+                                <div style={{ marginBottom: 32 }}>
+                                    <p>Logo scelto:</p>
+                                    <img src={teamImageUrl} alt="Logo Scelto" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)' }} />
+                                </div>
+                            )}
+
                             <button className="btn btn-lg btn-primary" onClick={handleNextStep}>
                                 Avanti ➡️
                             </button>
@@ -305,7 +368,10 @@ export default function SquadraPage() {
                     {/* STEP 3: READ-ONLY VIEW */}
                     {step === 3 && team && (
                         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-                            <div className="card" style={{ textAlign: 'center', marginBottom: 32, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white' }}>
+                            <div className="card" style={{ textAlign: 'center', marginBottom: 32, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                {team.imageUrl && (
+                                    <img src={team.imageUrl} alt="Team Logo" style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', border: '4px solid white', marginBottom: 16, backgroundColor: '#fff' }} />
+                                )}
                                 <h1 style={{ fontSize: '2.5rem', marginBottom: 8, textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>{team.name}</h1>
                                 <p style={{ opacity: 0.9, fontSize: '1.1rem' }}>La tua squadra ufficiale per il Fantachicco!</p>
                             </div>

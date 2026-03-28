@@ -31,7 +31,7 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
         }
 
-        const { name, competitorIds, captainId } = await request.json();
+        const { name, imageUrl, competitorIds, captainId } = await request.json();
 
         if (!name || !competitorIds || competitorIds.length !== 5) {
             return NextResponse.json(
@@ -85,6 +85,7 @@ export async function POST(request) {
         const team = await prisma.team.create({
             data: {
                 name,
+                imageUrl,
                 userId: user.userId,
                 captainId,
                 competitors: {

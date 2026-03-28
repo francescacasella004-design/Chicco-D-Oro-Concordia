@@ -238,9 +238,18 @@ function ClassificaSection() {
                             <div className="leaderboard-rank">
                                 {idx < 3 ? <span style={{ fontSize: '1.5rem' }}>{medals[idx]}</span> : <span>{idx + 1}</span>}
                             </div>
-                            <div className="leaderboard-info">
-                                <strong>{team.teamName}</strong>
-                                <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>{team.playerName}</span>
+                            <div className="leaderboard-info" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                {team.teamImageUrl ? (
+                                    <img src={team.teamImageUrl} alt="Team Logo" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)', backgroundColor: '#fff', flexShrink: 0 }} />
+                                ) : (
+                                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', flexShrink: 0 }}>
+                                        {team.teamName.charAt(0)}
+                                    </div>
+                                )}
+                                <div>
+                                    <strong>{team.teamName}</strong>
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', display: 'block' }}>{team.playerName}</span>
+                                </div>
                             </div>
                             <div className="leaderboard-score">{team.totalScore} pt</div>
 

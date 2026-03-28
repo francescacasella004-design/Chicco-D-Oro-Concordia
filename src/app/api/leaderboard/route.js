@@ -45,6 +45,7 @@ export async function GET() {
             return {
                 teamId: team.id,
                 teamName: team.name,
+                teamImageUrl: team.imageUrl,
                 playerName: team.user.name,
                 totalPoints,
                 competitors: competitorDetails,

@@ -25,7 +25,7 @@ export default function ContattiPage() {
                         <div className="card" style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '2rem', marginBottom: 8 }}>📍</div>
                             <h3 style={{ fontSize: '1rem', marginBottom: 4 }}>Dove siamo</h3>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Piazzetta+Concordia+80132+Napoli" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline' }}>Piazzetta Concordia, 80132 Napoli — Quartieri Spagnoli</a>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Chiesa+Santa+Maria+del+Carmine+alla+Concordia+Piazzetta+Concordia+Napoli" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline' }}>Chiesa S. Maria del Carmine alla Concordia — Piazzetta Concordia, Napoli</a>
                         </div>
                     </div>
 

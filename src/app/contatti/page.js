@@ -9,7 +9,7 @@ export default function ContattiPage() {
                 <div className="container" style={{ maxWidth: 600 }}>
                     <div className="card" style={{ textAlign: 'center', marginBottom: 24 }}>
                         <div style={{ fontSize: '3rem', marginBottom: 16 }}>⛪</div>
-                        <h2 style={{ marginBottom: 8 }}>Parrocchia Santa Maria del Carmelo alla Concordia</h2>
+                        <h2 style={{ marginBottom: 8 }}>Parrocchia Santa Maria del Carmine alla Concordia</h2>
                         <p style={{ color: 'var(--text-light)', lineHeight: 1.8 }}>
                             Fantachicco è un gioco organizzato dalla nostra parrocchia per un evento speciale.
                         </p>
@@ -20,11 +20,12 @@ export default function ContattiPage() {
                             <div style={{ fontSize: '2rem', marginBottom: 8 }}>📧</div>
                             <h3 style={{ fontSize: '1rem', marginBottom: 4 }}>Email</h3>
                             <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>info@fantachicco.it</p>
+                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: 4 }}>Parrocchiaconcordiayt@gmail.com</p>
                         </div>
                         <div className="card" style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '2rem', marginBottom: 8 }}>📍</div>
                             <h3 style={{ fontSize: '1rem', marginBottom: 4 }}>Dove siamo</h3>
-                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Parrocchia S. Maria del Carmelo</p>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Piazzetta+Concordia+80132+Napoli" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline' }}>Piazzetta Concordia, 80132 Napoli — Quartieri Spagnoli</a>
                         </div>
                     </div>
 

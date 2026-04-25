@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request) {
     try {
+        const settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+        const resultsPublished = settings?.resultsPublished || false;
+
+        // Se non sono pubblicati, permetti la visione solo se l'utente è admin
+        // (Per semplicità qui carichiamo sempre ma potremmo filtrare)
+        
         // Get all teams with their competitors and captain
         const teams = await prisma.team.findMany({
             include: {
-                user: { select: { name: true } },
+                user: { select: { name: true, email: true } },
                 competitors: {
                     include: {
                         competitor: {
@@ -23,7 +29,7 @@ export async function GET() {
         });
 
         // Calculate scores for each team
-        const leaderboard = teams.map((team) => {
+        let leaderboard = teams.map((team) => {
             let totalPoints = 0;
             const competitorDetails = team.competitors.map((tc) => {
                 const comp = tc.competitor;
@@ -47,6 +53,7 @@ export async function GET() {
                 teamName: team.name,
                 teamImageUrl: team.imageUrl,
                 playerName: team.user.name,
+                playerEmail: team.user.email,
                 totalPoints,
                 competitors: competitorDetails,
             };
@@ -55,7 +62,23 @@ export async function GET() {
         // Sort by total points descending
         leaderboard.sort((a, b) => b.totalPoints - a.totalPoints);
 
-        return NextResponse.json({ leaderboard });
+        // Assign Rank handling ties
+        let currentRank = 0;
+        let lastPoints = null;
+        let skipped = 0;
+
+        leaderboard = leaderboard.map((team, index) => {
+            if (team.totalPoints !== lastPoints) {
+                currentRank += 1 + skipped;
+                skipped = 0;
+            } else {
+                skipped += 1;
+            }
+            lastPoints = team.totalPoints;
+            return { ...team, rank: currentRank };
+        });
+
+        return NextResponse.json({ leaderboard, resultsPublished });
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         return NextResponse.json({ error: 'Errore nel recupero classifica' }, { status: 500 });

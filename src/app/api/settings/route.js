@@ -15,7 +15,10 @@ export async function GET() {
             });
         }
 
-        return NextResponse.json({ registrationOpen: settings.registrationOpen });
+        return NextResponse.json({ 
+            registrationOpen: settings.registrationOpen,
+            resultsPublished: settings.resultsPublished || false
+        });
     } catch (error) {
         console.error('Error fetching settings:', error);
         return NextResponse.json({ error: 'Errore nel recupero impostazioni' }, { status: 500 });
@@ -29,15 +32,22 @@ export async function PUT(request) {
             return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
         }
 
-        const { registrationOpen } = await request.json();
+        const data = await request.json();
+        
+        const updateData = {};
+        if (data.registrationOpen !== undefined) updateData.registrationOpen = data.registrationOpen;
+        if (data.resultsPublished !== undefined) updateData.resultsPublished = data.resultsPublished;
 
         const settings = await prisma.settings.upsert({
             where: { id: 'global' },
-            update: { registrationOpen },
-            create: { id: 'global', registrationOpen },
+            update: updateData,
+            create: { id: 'global', ...updateData },
         });
 
-        return NextResponse.json({ registrationOpen: settings.registrationOpen });
+        return NextResponse.json({ 
+            registrationOpen: settings.registrationOpen,
+            resultsPublished: settings.resultsPublished 
+        });
     } catch (error) {
         console.error('Error updating settings:', error);
         return NextResponse.json({ error: 'Errore aggiornamento impostazioni' }, { status: 500 });

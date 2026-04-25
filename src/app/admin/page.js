@@ -24,6 +24,7 @@ export default function AdminPage() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
     const [registrationOpen, setRegistrationOpen] = useState(true);
+    const [resultsPublished, setResultsPublished] = useState(false);
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
@@ -67,7 +68,11 @@ export default function AdminPage() {
             if (scoreRes.ok) { const data = await scoreRes.json(); setScoreHistory(data.scoreEvents || []); }
             if (annRes.ok) { const data = await annRes.json(); setAnnouncements(data.announcements || []); }
             if (usersRes.ok) { const data = await usersRes.json(); setUsers(data.users || []); }
-            if (settingsRes.ok) { const data = await settingsRes.json(); setRegistrationOpen(data.registrationOpen); }
+            if (settingsRes.ok) {
+                const data = await settingsRes.json();
+                setRegistrationOpen(data.registrationOpen);
+                setResultsPublished(data.resultsPublished);
+            }
             if (pendingRes && pendingRes.ok) { const data = await pendingRes.json(); setPendingScores(data.pendingScores || []); }
         } catch (error) {
             console.error('Error loading data:', error);
@@ -250,6 +255,44 @@ export default function AdminPage() {
                 fetchData();
             } else {
                 showMessage('error', 'Errore nella conferma');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePublishResults = async () => {
+        const confirmMsg = resultsPublished 
+            ? 'Vuoi NASCONDERE la classifica? I punteggi rimarranno confermati.' 
+            : 'Stai per pubblicare i risultati finali. Questo confermerà TUTTI i punteggi in attesa e renderà pubblica la classifica. Continuare?';
+            
+        if (!confirm(confirmMsg)) return;
+        
+        setLoading(true);
+        try {
+            // 1. Se stiamo pubblicando, conferma prima tutti i pending
+            if (!resultsPublished && pendingScores.length > 0) {
+                await fetch('/api/scores/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: pendingScores.map(ps => ps.id) }),
+                });
+            }
+            
+            // 2. Aggiorna lo stato di pubblicazione
+            const res = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resultsPublished: !resultsPublished })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                setResultsPublished(data.resultsPublished);
+                showMessage('success', data.resultsPublished ? 'Risultati Pubblicati!' : 'Risultati Nascosti');
+                fetchData();
             }
         } catch (e) {
             showMessage('error', 'Errore di rete');
@@ -444,6 +487,13 @@ export default function AdminPage() {
                                     disabled={pendingScores.length === 0}
                                 >
                                     ✅ Conferma Tutti ({pendingScores.length})
+                                </button>
+                                <button
+                                    className={`btn btn-sm ${resultsPublished ? 'btn-secondary' : 'btn-primary'}`}
+                                    onClick={handlePublishResults}
+                                    style={{fontWeight: 'bold', border: '2px solid white'}}
+                                >
+                                    {resultsPublished ? '👁️‍🗨️ Nascondi Classifica' : '🚀 Invia i Risultati (LIVE)'}
                                 </button>
                             </div>
                         </h2>

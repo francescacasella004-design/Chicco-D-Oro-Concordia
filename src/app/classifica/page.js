@@ -5,6 +5,7 @@ export default function ClassificaPage() {
     const [leaderboard, setLeaderboard] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedTeam, setExpandedTeam] = useState(null);
+    const [resultsPublished, setResultsPublished] = useState(false);
 
     useEffect(() => {
         fetchLeaderboard();
@@ -17,6 +18,7 @@ export default function ClassificaPage() {
             const res = await fetch('/api/leaderboard');
             const data = await res.json();
             setLeaderboard(data.leaderboard || []);
+            setResultsPublished(data.resultsPublished || false);
         } catch (e) {
             console.error(e);
         } finally {
@@ -24,17 +26,17 @@ export default function ClassificaPage() {
         }
     }
 
-    const getRankClass = (index) => {
-        if (index === 0) return 'top-1';
-        if (index === 1) return 'top-2';
-        if (index === 2) return 'top-3';
+    const getRankClass = (rank) => {
+        if (rank === 1) return 'top-1';
+        if (rank === 2) return 'top-2';
+        if (rank === 3) return 'top-3';
         return '';
     };
 
-    const getMedal = (index) => {
-        if (index === 0) return '🥇';
-        if (index === 1) return '🥈';
-        if (index === 2) return '🥉';
+    const getMedal = (rank) => {
+        if (rank === 1) return '🥇';
+        if (rank === 2) return '🥈';
+        if (rank === 3) return '🥉';
         return '';
     };
 
@@ -46,30 +48,39 @@ export default function ClassificaPage() {
         <>
             <div className="page-header">
                 <h1>🏆 Classifica</h1>
-                <p>Aggiornamento automatico ogni 15 secondi</p>
+                <p>{resultsPublished ? 'Risultati Finali' : 'Aggiornamento automatico ogni 15 secondi'}</p>
             </div>
             <section className="section">
                 <div className="container" style={{ maxWidth: 700 }}>
-                    {leaderboard.length === 0 ? (
+                    {!resultsPublished ? (
+                        <div className="empty-state">
+                            <div className="empty-state-icon">🔒</div>
+                            <h3>Classifica Non Pubblicata</h3>
+                            <p>I risultati verranno mostrati ufficialmente al termine dell'evento!</p>
+                        </div>
+                    ) : leaderboard.length === 0 ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">📊</div>
                             <h3>Nessuna squadra ancora</h3>
-                            <p>La classifica si popolerà quando i giocatori creeranno le loro squadre!</p>
+                            <p>La classifica si popolerà quando i risultati verranno confermati!</p>
                         </div>
                     ) : (
-                        leaderboard.map((entry, index) => (
+                        leaderboard.map((entry) => (
                             <div key={entry.teamId}>
                                 <div
-                                    className={`leaderboard-item ${getRankClass(index)}`}
+                                    className={`leaderboard-item ${getRankClass(entry.rank)}`}
                                     onClick={() => setExpandedTeam(expandedTeam === entry.teamId ? null : entry.teamId)}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ cursor: 'pointer', transition: 'all 0.3s' }}
                                 >
                                     <div className="leaderboard-rank">
-                                        {getMedal(index) || (index + 1)}
+                                        {getMedal(entry.rank) || entry.rank}
                                     </div>
                                     <div className="leaderboard-info">
                                         <div className="leaderboard-team">{entry.teamName}</div>
-                                        <div className="leaderboard-player">di {entry.playerName}</div>
+                                        <div className="leaderboard-player">
+                                            <span>di <strong>{entry.playerName}</strong></span>
+                                            <span style={{fontSize: '0.8rem', opacity: 0.7, marginLeft: 8}}>({entry.playerEmail})</span>
+                                        </div>
                                     </div>
                                     <div className="leaderboard-points">{entry.totalPoints} pt</div>
                                 </div>

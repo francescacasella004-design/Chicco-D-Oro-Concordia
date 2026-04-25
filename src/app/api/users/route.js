@@ -94,3 +94,28 @@ export async function DELETE(request) {
         return NextResponse.json({ error: 'Errore cancellazione utente' }, { status: 500 });
     }
 }
+
+export async function PATCH(request) {
+    try {
+        const admin = await getUserFromRequest(request);
+        if (!admin || admin.role !== 'admin') {
+            return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
+        }
+
+        const { id, role } = await request.json();
+
+        if (!id || !role) {
+            return NextResponse.json({ error: 'ID e ruolo obbligatori' }, { status: 400 });
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: parseInt(id) },
+            data: { role }
+        });
+
+        return NextResponse.json({ success: true, user: { id: updatedUser.id, role: updatedUser.role } });
+    } catch (error) {
+        console.error('Update role error:', error);
+        return NextResponse.json({ error: 'Errore aggiornamento ruolo' }, { status: 500 });
+    }
+}

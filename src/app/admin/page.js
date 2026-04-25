@@ -14,6 +14,7 @@ export default function AdminPage() {
     const [scoreHistory, setScoreHistory] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
     const [users, setUsers] = useState([]);
+    const [pendingScores, setPendingScores] = useState([]);
 
     // Form State
     const [selectedBonusMalus, setSelectedBonusMalus] = useState('');
@@ -36,6 +37,12 @@ export default function AdminPage() {
     const [newAnnouncement, setNewAnnouncement] = useState({ title: '', content: '', pinned: false });
 
     useEffect(() => {
+        if (user?.role === 'admin') {
+            fetchData();
+        }
+    }, [activeTab]);
+
+    useEffect(() => {
         if (!authLoading && (!user || user.role !== 'admin')) {
             router.push('/login');
         } else if (user?.role === 'admin') {
@@ -45,13 +52,14 @@ export default function AdminPage() {
 
     const fetchData = async () => {
         try {
-            const [compRes, bmRes, scoreRes, annRes, usersRes, settingsRes] = await Promise.all([
+            const [compRes, bmRes, scoreRes, annRes, usersRes, settingsRes, pendingRes] = await Promise.all([
                 fetch('/api/competitors', { cache: 'no-store' }),
                 fetch('/api/bonus-malus', { cache: 'no-store' }),
                 fetch('/api/scores', { cache: 'no-store' }),
                 fetch('/api/announcements', { cache: 'no-store' }),
                 fetch('/api/users', { cache: 'no-store' }),
-                fetch('/api/settings', { cache: 'no-store' })
+                fetch('/api/settings', { cache: 'no-store' }),
+                fetch('/api/scores/pending', { cache: 'no-store' })
             ]);
 
             if (compRes.ok) { const data = await compRes.json(); setCompetitors(data.competitors || []); }
@@ -60,6 +68,7 @@ export default function AdminPage() {
             if (annRes.ok) { const data = await annRes.json(); setAnnouncements(data.announcements || []); }
             if (usersRes.ok) { const data = await usersRes.json(); setUsers(data.users || []); }
             if (settingsRes.ok) { const data = await settingsRes.json(); setRegistrationOpen(data.registrationOpen); }
+            if (pendingRes && pendingRes.ok) { const data = await pendingRes.json(); setPendingScores(data.pendingScores || []); }
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -96,7 +105,7 @@ export default function AdminPage() {
         }
         setLoading(true);
         try {
-            const res = await fetch('/api/scores', {
+            const res = await fetch('/api/scores/pending', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -105,9 +114,8 @@ export default function AdminPage() {
                 }),
             });
             if (res.ok) {
-                showMessage('success', 'Punteggio assegnato!');
-                // rimosso reset di selectedBonusMalus e scoreType per permettere assegnazioni multiple
-                fetchData(); // Refresh history
+                showMessage('success', 'Punteggio salvato in attesa di revisione!');
+                fetchData(); // Refresh pending scores
             } else {
                 const data = await res.json();
                 showMessage('error', data.error || 'Errore');
@@ -136,6 +144,27 @@ export default function AdminPage() {
                 fetchData();
             } else {
                 showMessage('error', 'Errore eliminazione');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        }
+    };
+
+    const handleToggleRole = async (userId, currentRole) => {
+        const newRole = currentRole === 'admin' ? 'player' : 'admin';
+        if (!confirm(`Vuoi rendere questo utente un ${newRole === 'admin' ? 'Admin' : 'Giocatore'}?`)) return;
+
+        try {
+            const res = await fetch('/api/users', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, role: newRole }),
+            });
+            if (res.ok) {
+                showMessage('success', 'Ruolo aggiornato con successo');
+                fetchData();
+            } else {
+                showMessage('error', 'Errore aggiornamento ruolo');
             }
         } catch (e) {
             showMessage('error', 'Errore di rete');
@@ -207,6 +236,43 @@ export default function AdminPage() {
         }
     };
 
+    const handleConfirmScores = async (ids) => {
+        if (!ids || ids.length === 0) return;
+        setLoading(true);
+        try {
+            const res = await fetch('/api/scores/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids }),
+            });
+            if (res.ok) {
+                showMessage('success', `${ids.length} punteggi confermati ufficialmente!`);
+                fetchData();
+            } else {
+                showMessage('error', 'Errore nella conferma');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeletePending = async (id) => {
+        if (!confirm('Eliminare questo punteggio in attesa?')) return;
+        try {
+            const res = await fetch(`/api/scores/pending?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                showMessage('success', 'Punteggio eliminato');
+                fetchData();
+            } else {
+                showMessage('error', 'Errore eliminazione');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        }
+    };
+
     if (authLoading || (!user || user.role !== 'admin')) return <div className="loading"><div className="spinner"></div></div>;
 
     const filteredCompetitorsForScoring = competitors
@@ -220,7 +286,7 @@ export default function AdminPage() {
     return (
         <div className="container section">
             <div className="page-header" style={{ marginBottom: 32, borderRadius: 'var(--radius)' }}>
-                <h1>🔧 Pannello Admin</h1>
+                <h1>🔧 Pannello Organizzatore</h1>
                 <p>Gestisci il Fantachicco</p>
             </div>
 
@@ -244,11 +310,11 @@ export default function AdminPage() {
             </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-                {['assegna', 'concorrenti', 'regole', 'storico', 'avvisi', 'utenti'].map(tab => (
+                {['assegna', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
                     <button key={tab}
                         className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setActiveTab(tab)}>
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === 'organizzatori' ? '👥 Organizzatori' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
                 ))}
             </div>
@@ -354,6 +420,73 @@ export default function AdminPage() {
                         ) : (
                             <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>
                                 Nessun concorrente trovato in questa lista.
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* === REVISIONE PUNTEGGI === */}
+                {activeTab === 'revisione' && (
+                    <div>
+                        <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>👀 Revisione Punteggi</span>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => { if (confirm('Svuotare tutti i punteggi in attesa?')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
+                                    disabled={pendingScores.length === 0}
+                                >
+                                    🗑️ Svuota Tutto
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-success"
+                                    onClick={() => handleConfirmScores(pendingScores.map(ps => ps.id))}
+                                    disabled={pendingScores.length === 0}
+                                >
+                                    ✅ Conferma Tutti ({pendingScores.length})
+                                </button>
+                            </div>
+                        </h2>
+
+                        <p style={{ color: 'var(--text-light)', marginBottom: 20 }}>
+                            Questi punteggi sono stati assegnati ma non sono ancora visibili nella classifica.
+                            Controllali e confermali per renderli ufficiali.
+                        </p>
+
+                        {pendingScores.length > 0 ? (
+                            <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+                                {Array.from(new Set(pendingScores.map(ps => ps.assignedBy.id))).map(adminId => {
+                                    const adminScores = pendingScores.filter(ps => ps.assignedBy.id === adminId);
+                                    const adminName = adminScores[0].assignedBy.name;
+                                    return (
+                                        <div key={adminId} className="card" style={{ background: 'var(--background)', border: '1px solid var(--border)' }}>
+                                            <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 15, display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>👤 {adminName}</span>
+                                                <span className="tag">{adminScores.length}</span>
+                                            </h3>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                                {adminScores.map(ps => (
+                                                    <div key={ps.id} className="score-history-item" style={{ padding: '8px 12px', fontSize: '0.9rem' }}>
+                                                        <div style={{ flex: 1 }}>
+                                                            <strong>{ps.competitor.name}</strong>
+                                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
+                                                                {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', gap: 5 }}>
+                                                            <button className="btn btn-sm btn-danger" onClick={() => handleDeletePending(ps.id)}>🗑️</button>
+                                                            <button className="btn btn-sm btn-success" onClick={() => handleConfirmScores([ps.id])}>✅</button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>
+                                Nessun punteggio in attesa di revisione.
                             </div>
                         )}
                     </div>
@@ -473,10 +606,58 @@ export default function AdminPage() {
                     </div>
                 )}
 
-                {/* === UTENTI === */}
-                {activeTab === 'utenti' && (
+                {/* === ORGANIZZATORI (ex UTENTI) === */}
+                {activeTab === 'organizzatori' && (
                     <div>
-                        <h2 className="card-title">👥 Gestione Utenti</h2>
+                        <h2 className="card-title">👥 Gestione Organizzatori</h2>
+                        
+                        <div className="card" style={{ marginBottom: 24, border: '2px solid var(--primary)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: 15, color: 'var(--primary)' }}>➕ Aggiungi Nuovo Organizzatore</h3>
+                            <p style={{fontSize: '0.9rem', marginBottom: 15}}>Crea un account che potrà assegnare punti e gestire il sito.</p>
+                            <div className="admin-grid">
+                                <input id="newAdminName" className="form-input" placeholder="Nome (es. Admin 2)" />
+                                <input id="newAdminEmail" className="form-input" placeholder="Email (es. admin2@fantachicco.it)" />
+                                <input id="newAdminPassword" type="password" className="form-input" placeholder="Password" />
+                                <button className="btn btn-primary" style={{fontWeight: 'bold'}} onClick={async () => {
+                                    const name = document.getElementById('newAdminName').value;
+                                    const email = document.getElementById('newAdminEmail').value;
+                                    const password = document.getElementById('newAdminPassword').value;
+                                    if(!name || !email || !password) return alert('Compila tutti i campi');
+                                    
+                                    setLoading(true);
+                                    try {
+                                        const res = await fetch('/api/auth/register', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ name, email, password }),
+                                        });
+                                        const data = await res.json();
+                                        if(res.ok) {
+                                            // Ora promuovilo ad admin
+                                            const roleRes = await fetch('/api/users', {
+                                                method: 'PATCH',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ id: data.id, role: 'admin' }),
+                                            });
+                                            if(roleRes.ok) {
+                                                alert('Organizzatore creato con successo!');
+                                                // Svuota i campi
+                                                document.getElementById('newAdminName').value = '';
+                                                document.getElementById('newAdminEmail').value = '';
+                                                document.getElementById('newAdminPassword').value = '';
+                                                fetchData();
+                                            } else {
+                                                alert('Account creato ma errore nella promozione a organizzatore.');
+                                            }
+                                        } else {
+                                            alert('Errore: ' + data.error);
+                                        }
+                                    } catch(e) { alert('Errore di rete'); }
+                                    finally { setLoading(false); }
+                                }}>Crea Organizzatore</button>
+                            </div>
+                        </div>
+
                         <div style={{ maxHeight: 500, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
                             {users.map(u => (
                                 <div key={u.id} className="score-history-item">
@@ -493,6 +674,15 @@ export default function AdminPage() {
                                         >
                                             👁️ Vedi Squadra
                                         </button>
+                                        {u.id !== user.userId && (
+                                            <button
+                                                className={`btn btn-sm ${u.role === 'admin' ? 'btn-danger' : 'btn-success'}`}
+                                                onClick={() => handleToggleRole(u.id, u.role)}
+                                                title={u.role === 'admin' ? "Rendi Giocatore" : "Rendi Organizzatore"}
+                                            >
+                                                {u.role === 'admin' ? '👤 Rendi Giocatore' : '👑 Rendi Organizzatore'}
+                                            </button>
+                                        )}
                                         <button
                                             className="btn btn-sm btn-danger"
                                             onClick={() => handleDelete('user', u.id)}

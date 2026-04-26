@@ -309,21 +309,26 @@ function RegoleSection() {
                 {loading ? (
                     <div className="loading"><div className="spinner"></div></div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                         {/* BONUS */}
-                        <div className="card" style={{ borderTop: '4px solid var(--success)' }}>
-                            <h3 style={{ marginBottom: 16, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="card" style={{ borderTop: '5px solid var(--success)', borderLeft: '3px solid rgba(76, 175, 80, 0.25)' }}>
+                            <h3 style={{
+                                marginBottom: 20, color: 'var(--success)',
+                                display: 'flex', alignItems: 'center', gap: 10,
+                                fontSize: '1.4rem', fontFamily: 'var(--font-heading)'
+                            }}>
                                 <span style={{ fontSize: '1.5rem' }}>✅</span> Bonus
                             </h3>
                             {bonusList.length === 0 ? (
                                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun bonus definito</p>
-                            ) : bonusList.map(r => (
+                            ) : bonusList.map((r, idx) => (
                                 <div key={r.id} style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                    padding: '12px 0',
+                                    borderBottom: idx < bonusList.length - 1 ? '1px solid var(--border)' : 'none',
                                 }}>
-                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{r.description}</span>
-                                    <span className="tag tag-bonus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1, lineHeight: 1.4, paddingRight: 12 }}>{r.description}</span>
+                                    <span className="tag tag-bonus" style={{ marginLeft: 8, whiteSpace: 'nowrap', fontWeight: 700 }}>
                                         +{r.points} pt
                                     </span>
                                 </div>
@@ -331,19 +336,24 @@ function RegoleSection() {
                         </div>
 
                         {/* MALUS */}
-                        <div className="card" style={{ borderTop: '4px solid var(--danger)' }}>
-                            <h3 style={{ marginBottom: 16, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="card" style={{ borderTop: '5px solid var(--danger)', borderLeft: '3px solid rgba(211, 47, 47, 0.2)' }}>
+                            <h3 style={{
+                                marginBottom: 20, color: 'var(--danger)',
+                                display: 'flex', alignItems: 'center', gap: 10,
+                                fontSize: '1.4rem', fontFamily: 'var(--font-heading)'
+                            }}>
                                 <span style={{ fontSize: '1.5rem' }}>❌</span> Malus
                             </h3>
                             {malusList.length === 0 ? (
                                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Nessun malus definito</p>
-                            ) : malusList.map(r => (
+                            ) : malusList.map((r, idx) => (
                                 <div key={r.id} style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    padding: '10px 0', borderBottom: '1px solid var(--border)'
+                                    padding: '12px 0',
+                                    borderBottom: idx < malusList.length - 1 ? '1px solid var(--border)' : 'none',
                                 }}>
-                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{r.description}</span>
-                                    <span className="tag tag-malus" style={{ marginLeft: 8, whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontSize: '0.9rem', flex: 1, lineHeight: 1.4, paddingRight: 12 }}>{r.description}</span>
+                                    <span className="tag tag-malus" style={{ marginLeft: 8, whiteSpace: 'nowrap', fontWeight: 700 }}>
                                         {r.points} pt
                                     </span>
                                 </div>

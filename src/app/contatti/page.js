@@ -25,7 +25,16 @@ export default function ContattiPage() {
                         <div className="card" style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '2rem', marginBottom: 8 }}>📍</div>
                             <h3 style={{ fontSize: '1rem', marginBottom: 4 }}>Dove siamo</h3>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Chiesa+Santa+Maria+del+Carmine+alla+Concordia+Piazzetta+Concordia+Napoli" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline' }}>Chiesa S. Maria del Carmine alla Concordia — Piazzetta Concordia, Napoli</a>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Chiesa+Santa+Maria+del+Carmine+alla+Concordia+Piazzetta+Concordia+Napoli" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline', lineHeight: 1.4 }}>
+                                    <strong>Parrocchia S. Maria del Carmine alla Concordia</strong><br/>
+                                    Piazzetta Concordia, Napoli
+                                </a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Teatro+Politeama+Napoli+Via+Monte+di+Dio+80" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'underline', lineHeight: 1.4 }}>
+                                    <strong>Teatro Politeama</strong><br/>
+                                    Via Monte di Dio, 80, Napoli
+                                </a>
+                            </div>
                         </div>
                     </div>
 

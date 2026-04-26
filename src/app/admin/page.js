@@ -25,6 +25,7 @@ export default function AdminPage() {
     const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
     const [registrationOpen, setRegistrationOpen] = useState(true);
     const [resultsPublished, setResultsPublished] = useState(false);
+    const [bmSearch, setBmSearch] = useState('');
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
@@ -103,8 +104,9 @@ export default function AdminPage() {
         }
     };
 
-    const handleAssignScore = async (competitorId) => {
-        if (!competitorId || !selectedBonusMalus) {
+    const handleAssignScore = async (competitorId, bonusMalusId) => {
+        const bmId = bonusMalusId || selectedBonusMalus;
+        if (!competitorId || !bmId) {
             showMessage('error', 'Seleziona concorrente e bonus/malus');
             return;
         }
@@ -115,11 +117,12 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     competitorId: parseInt(competitorId),
-                    bonusMalusId: parseInt(selectedBonusMalus),
+                    bonusMalusId: parseInt(bmId),
                 }),
             });
             if (res.ok) {
-                showMessage('success', 'Punteggio salvato in attesa di revisione!');
+                showMessage('success', 'Punteggio aggiunto!');
+                setSelectedBonusMalus('');
                 fetchData(); // Refresh pending scores
             } else {
                 const data = await res.json();
@@ -416,49 +419,106 @@ export default function AdminPage() {
                                         Succ &gt;
                                     </button>
                                 </div>
-                                <div className="admin-grid" style={{ gridTemplateColumns: '1fr' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Tipo di Punteggio</label>
-                                        <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
-                                            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                <input
-                                                    type="radio"
-                                                    name="scoreType"
-                                                    value="bonus"
-                                                    checked={scoreType === 'bonus'}
-                                                    onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
-                                                />
-                                                Bonus (+ punti)
-                                            </label>
-                                            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                <input
-                                                    type="radio"
-                                                    name="scoreType"
-                                                    value="malus"
-                                                    checked={scoreType === 'malus'}
-                                                    onChange={(e) => { setScoreType(e.target.value); setSelectedBonusMalus(''); }}
-                                                />
-                                                Malus (- punti)
-                                            </label>
+                                <div style={{ marginBottom: 20 }}>
+                                    <input 
+                                        type="text" 
+                                        className="form-input" 
+                                        placeholder="🔍 Cerca Bonus o Malus..." 
+                                        value={bmSearch}
+                                        onChange={(e) => setBmSearch(e.target.value)}
+                                        style={{ marginBottom: 16 }}
+                                    />
+                                    
+                                    <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                                        {/* COLONNA BONUS */}
+                                        <div>
+                                            <h4 style={{ color: 'var(--success)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                🟢 Bonus
+                                            </h4>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                                {bonusMalus
+                                                    .filter(bm => bm.points > 0)
+                                                    .filter(bm => bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
+                                                    .sort((a, b) => b.points - a.points)
+                                                    .map(bm => (
+                                                        <button 
+                                                            key={bm.id} 
+                                                            className="btn btn-secondary" 
+                                                            style={{ 
+                                                                justifyContent: 'flex-start', 
+                                                                textAlign: 'left', 
+                                                                padding: '12px',
+                                                                height: 'auto',
+                                                                fontSize: '0.9rem',
+                                                                borderLeft: '6px solid var(--success)',
+                                                                textTransform: 'none'
+                                                            }}
+                                                            onClick={() => handleAssignScore(currentCompetitorToScore.id, bm.id)}
+                                                            disabled={loading}
+                                                        >
+                                                            <span style={{ fontWeight: 800, color: 'var(--success)', minWidth: '40px' }}>+{bm.points}</span>
+                                                            <span style={{ marginLeft: 8 }}>{bm.description}</span>
+                                                        </button>
+                                                    ))}
+                                            </div>
                                         </div>
-                                        <select className="admin-select" value={selectedBonusMalus} onChange={(e) => setSelectedBonusMalus(e.target.value)}>
-                                            <option value="">Seleziona {scoreType === 'bonus' ? 'un bonus' : 'un malus'}...</option>
-                                            {bonusMalus
-                                                .filter(bm => scoreType === 'bonus' ? bm.points > 0 : bm.points < 0)
-                                                .map(bm => (
-                                                    <option key={bm.id} value={bm.id}>{bm.points > 0 ? '+' : ''}{bm.points} - {bm.description}</option>
-                                                ))}
-                                        </select>
+
+                                        {/* COLONNA MALUS */}
+                                        <div>
+                                            <h4 style={{ color: 'var(--danger)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                🔴 Malus
+                                            </h4>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                                {bonusMalus
+                                                    .filter(bm => bm.points < 0)
+                                                    .filter(bm => bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
+                                                    .sort((a, b) => a.points - b.points)
+                                                    .map(bm => (
+                                                        <button 
+                                                            key={bm.id} 
+                                                            className="btn btn-secondary" 
+                                                            style={{ 
+                                                                justifyContent: 'flex-start', 
+                                                                textAlign: 'left', 
+                                                                padding: '12px',
+                                                                height: 'auto',
+                                                                fontSize: '0.9rem',
+                                                                borderLeft: '6px solid var(--danger)',
+                                                                textTransform: 'none'
+                                                            }}
+                                                            onClick={() => handleAssignScore(currentCompetitorToScore.id, bm.id)}
+                                                            disabled={loading}
+                                                        >
+                                                            <span style={{ fontWeight: 800, color: 'var(--danger)', minWidth: '40px' }}>{bm.points}</span>
+                                                            <span style={{ marginLeft: 8 }}>{bm.description}</span>
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    className="btn btn-primary btn-lg"
-                                    onClick={() => handleAssignScore(currentCompetitorToScore.id)}
-                                    disabled={loading || !selectedBonusMalus}
-                                    style={{ width: '100%', marginTop: 16 }}
-                                >
-                                    {loading ? 'Assegnazione...' : `Assegna Punteggio`}
-                                </button>
+
+                                {/* PUNTEGGI APPENA ASSEGNATI */}
+                                {pendingScores.filter(ps => ps.competitorId === currentCompetitorToScore.id).length > 0 && (
+                                    <div style={{ marginTop: 32, padding: 16, background: 'rgba(var(--primary-rgb), 0.05)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                                        <h4 style={{ fontSize: '0.9rem', marginBottom: 10, opacity: 0.8 }}>⚡ Appena assegnati a {currentCompetitorToScore.name}:</h4>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                            {pendingScores
+                                                .filter(ps => ps.competitorId === currentCompetitorToScore.id)
+                                                .map(ps => (
+                                                    <span key={ps.id} className={ps.bonusMalus.points > 0 ? 'tag tag-bonus' : 'tag tag-malus'}>
+                                                        {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); handleDeletePending(ps.id); }}
+                                                            style={{ background: 'none', border: 'none', marginLeft: 6, cursor: 'pointer', color: 'inherit', fontWeight: 'bold' }}
+                                                        >
+                                                            &times;
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>

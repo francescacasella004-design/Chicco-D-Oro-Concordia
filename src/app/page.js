@@ -94,6 +94,24 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      {/* Sponsor */}
+      <section className="section" style={{ background: '#f9fafb', borderTop: '1px solid #eee', paddingBottom: '40px' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <h2 className="section-title" style={{ fontSize: '1.5rem', marginBottom: 32, color: 'var(--text)' }}>
+            Sponsor ufficiali Chicco d&apos;Oro 2026
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '40px', alignItems: 'center' }}>
+            {/* 
+              Per visualizzare le immagini correttamente, rinomina le immagini che hai caricato in 
+              sponsor-1.jpg (I Fratelli Frenna), sponsor-2.jpg (Logo Montagna G) e sponsor-3.jpg (Gennaro Bottone)
+              e spostale nella cartella "public" del progetto. Se sono in formato .png, aggiorna l'estensione qui sotto.
+            */}
+            <img src="/sponsor-1.jpg" alt="I Fratelli Frenna" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/sponsor-2.jpg" alt="Sponsor G" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/sponsor-3.jpg" alt="Gennaro Bottone" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+          </div>
+        </div>
+      </section>
     </>
   );
 }

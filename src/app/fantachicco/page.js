@@ -296,9 +296,11 @@ function RegoleSection() {
                 <p className="section-subtitle">Ecco come si guadagnano (o perdono) i punti</p>
 
                 {/* Regole generali */}
-                <div className="card" style={{ marginBottom: 24 }}>
-                    <h3 style={{ marginBottom: 12 }}>📐 Regole generali</h3>
-                    <ul style={{ paddingLeft: 20, color: 'var(--text-light)', lineHeight: 2 }}>
+                <div className="card" style={{ marginBottom: 28, borderLeft: '5px solid var(--primary)' }}>
+                    <h3 style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10, fontSize: '1.1rem' }}>
+                        <span>📐</span> Regole generali
+                    </h3>
+                    <ul style={{ paddingLeft: 24, color: 'var(--text-light)', lineHeight: 2.2, fontSize: '0.95rem' }}>
                         <li>Ogni giocatore sceglie <strong>5 concorrenti</strong> con un budget di <strong>100 crediti</strong></li>
                         <li>Un concorrente viene nominato <strong>capitano</strong> — i suoi punti valgono <strong>x2</strong></li>
                         <li>I punti vengono assegnati dagli organizzatori durante l&apos;evento</li>

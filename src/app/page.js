@@ -105,20 +105,20 @@ export default function HomePage() {
               Tenta prima di caricare il file .jpg, se non lo trova prova con il formato .png
             */}
             <img 
-              src="/fratelli frenna.jpg" 
-              onError={(e) => { e.currentTarget.src = "/fratelli frenna.png"; e.currentTarget.onerror = null; }} 
+              src="/fratelli frenna.png" 
+              onError={(e) => { e.currentTarget.src = "/fratelli frenna.jpg"; e.currentTarget.onerror = null; }} 
               alt="I Fratelli Frenna" 
               style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
             />
             <img 
-              src="/gpoint.jpg" 
-              onError={(e) => { e.currentTarget.src = "/gpoint.png"; e.currentTarget.onerror = null; }} 
+              src="/gpoint.png" 
+              onError={(e) => { e.currentTarget.src = "/gpoint.jpg"; e.currentTarget.onerror = null; }} 
               alt="Gpoint" 
               style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
             />
             <img 
-              src="/bottone.jpg" 
-              onError={(e) => { e.currentTarget.src = "/bottone.png"; e.currentTarget.onerror = null; }} 
+              src="/bottone.png" 
+              onError={(e) => { e.currentTarget.src = "/bottone.jpg"; e.currentTarget.onerror = null; }} 
               alt="Gennaro Bottone" 
               style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
             />

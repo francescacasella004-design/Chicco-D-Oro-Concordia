@@ -102,13 +102,12 @@ export default function HomePage() {
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '40px', alignItems: 'center' }}>
             {/* 
-              Per visualizzare le immagini correttamente, rinomina le immagini che hai caricato in 
-              sponsor-1.jpg (I Fratelli Frenna), sponsor-2.jpg (Logo Montagna G) e sponsor-3.jpg (Gennaro Bottone)
-              e spostale nella cartella "public" del progetto. Se sono in formato .png, aggiorna l'estensione qui sotto.
+              Assicurati che le immagini abbiano l'estensione corretta (.jpg o .png).
+              Se sono .png, aggiorna semplicemente .jpg in .png qui sotto.
             */}
-            <img src="/sponsor-1.jpg" alt="I Fratelli Frenna" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
-            <img src="/sponsor-2.jpg" alt="Sponsor G" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
-            <img src="/sponsor-3.jpg" alt="Gennaro Bottone" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/fratelli frenna.jpg" alt="I Fratelli Frenna" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/gpoint.jpg" alt="Gpoint" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/bottone.jpg" alt="Gennaro Bottone" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
           </div>
         </div>
       </section>

@@ -102,12 +102,26 @@ export default function HomePage() {
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '40px', alignItems: 'center' }}>
             {/* 
-              Assicurati che le immagini abbiano l'estensione corretta (.jpg o .png).
-              Se sono .png, aggiorna semplicemente .jpg in .png qui sotto.
+              Tenta prima di caricare il file .jpg, se non lo trova prova con il formato .png
             */}
-            <img src="/fratelli frenna.jpg" alt="I Fratelli Frenna" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
-            <img src="/gpoint.jpg" alt="Gpoint" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
-            <img src="/bottone.jpg" alt="Gennaro Bottone" style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} />
+            <img 
+              src="/fratelli frenna.jpg" 
+              onError={(e) => { e.currentTarget.src = "/fratelli frenna.png"; e.currentTarget.onerror = null; }} 
+              alt="I Fratelli Frenna" 
+              style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
+            />
+            <img 
+              src="/gpoint.jpg" 
+              onError={(e) => { e.currentTarget.src = "/gpoint.png"; e.currentTarget.onerror = null; }} 
+              alt="Gpoint" 
+              style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
+            />
+            <img 
+              src="/bottone.jpg" 
+              onError={(e) => { e.currentTarget.src = "/bottone.png"; e.currentTarget.onerror = null; }} 
+              alt="Gennaro Bottone" 
+              style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
+            />
           </div>
         </div>
       </section>

@@ -105,8 +105,8 @@ export default function HomePage() {
               Tenta prima di caricare il file .jpg, se non lo trova prova con il formato .png
             */}
             <img 
-              src="/fratelli frenna.png" 
-              onError={(e) => { e.currentTarget.src = "/fratelli frenna.jpg"; e.currentTarget.onerror = null; }} 
+              src="/fratelli-frenna.png" 
+              onError={(e) => { e.currentTarget.src = "/fratelli-frenna.jpg"; e.currentTarget.onerror = null; }} 
               alt="I Fratelli Frenna" 
               style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
             />

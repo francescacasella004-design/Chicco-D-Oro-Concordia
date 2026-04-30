@@ -201,11 +201,15 @@ function ClassificaSection() {
     const [leaderboard, setLeaderboard] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expanded, setExpanded] = useState(null);
+    const [resultsPublished, setResultsPublished] = useState(false);
 
     const fetchLeaderboard = () => {
         fetch('/api/leaderboard')
             .then(res => res.json())
-            .then(data => setLeaderboard(data.leaderboard || []))
+            .then(data => {
+                setLeaderboard(data.leaderboard || []);
+                setResultsPublished(data.resultsPublished || false);
+            })
             .catch(() => { })
             .finally(() => setLoading(false));
     };
@@ -226,6 +230,40 @@ function ClassificaSection() {
 
                 {loading ? (
                     <div className="loading"><div className="spinner"></div></div>
+                ) : !resultsPublished ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div className="card" style={{ textAlign: 'center', marginBottom: 24, padding: 20 }}>
+                            <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
+                            <h3 style={{ margin: 0 }}>Elenco Squadre Partecipanti</h3>
+                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: 8 }}>
+                                I punteggi verranno mostrati ufficialmente al termine dell'evento!
+                            </p>
+                        </div>
+                        {[...leaderboard]
+                            .sort((a, b) => a.teamName.localeCompare(b.teamName))
+                            .map((team) => (
+                                <div key={team.teamId} className="leaderboard-item" style={{ cursor: 'default' }}>
+                                    <div className="leaderboard-rank" style={{ opacity: 0.5, fontSize: '0.8rem' }}>
+                                        #
+                                    </div>
+                                    <div className="leaderboard-info" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        {team.teamImageUrl ? (
+                                            <img src={team.teamImageUrl} alt="Team Logo" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)', backgroundColor: '#fff', flexShrink: 0 }} />
+                                        ) : (
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', flexShrink: 0 }}>
+                                                {team.teamName.charAt(0)}
+                                            </div>
+                                        )}
+                                        <div>
+                                            <strong>{team.teamName}</strong>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', display: 'block' }}>{team.playerName}</span>
+                                        </div>
+                                    </div>
+                                    <div className="leaderboard-score" style={{ opacity: 0.5 }}>pt</div>
+                                </div>
+                            ))
+                        }
+                    </div>
                 ) : leaderboard.length === 0 ? (
                     <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
                         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🏟️</div>
@@ -251,15 +289,15 @@ function ClassificaSection() {
                                     <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', display: 'block' }}>{team.playerName}</span>
                                 </div>
                             </div>
-                            <div className="leaderboard-score">{team.totalScore} pt</div>
+                            <div className="leaderboard-score">{team.totalPoints || team.totalScore || 0} pt</div>
 
                             {expanded === team.teamId && team.competitors && (
                                 <div style={{ width: '100%', marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
                                     {team.competitors.map(c => (
                                         <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '0.85rem' }}>
                                             <span>{c.isCaptain ? '👑 ' : ''}{c.name}</span>
-                                            <span style={{ color: c.points >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                                                {c.points > 0 ? '+' : ''}{c.points} pt
+                                            <span style={{ color: (c.finalPoints || c.points || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+                                                {(c.finalPoints || c.points || 0) > 0 ? '+' : ''}{c.finalPoints || c.points || 0} pt
                                             </span>
                                         </div>
                                     ))}

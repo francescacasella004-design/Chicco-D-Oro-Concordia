@@ -7,6 +7,13 @@ export default function FantachiccoPage() {
     const { user } = useAuth();
     const [activeSection, setActiveSection] = useState('info');
 
+    const sections = [
+        { id: 'info', label: '🏠 Fantachicco', icon: '🎮' },
+        { id: 'come-si-gioca', label: '📖 Come si gioca', icon: '📖' },
+        { id: 'classifica', label: '🏆 Classifica', icon: '🏆' },
+        { id: 'regole', label: '📋 Regole', icon: '📋' },
+    ];
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab');
@@ -14,13 +21,6 @@ export default function FantachiccoPage() {
             setActiveSection(tab);
         }
     }, []);
-
-    const sections = [
-        { id: 'info', label: '🏠 Fantachicco', icon: '🎮' },
-        { id: 'come-si-gioca', label: '📖 Come si gioca', icon: '📖' },
-        { id: 'classifica', label: '🏆 Classifica', icon: '🏆' },
-        { id: 'regole', label: '📋 Regole', icon: '📋' },
-    ];
 
     return (
         <>

@@ -28,6 +28,7 @@ export default function AdminPage() {
     const [bmSearch, setBmSearch] = useState('');
     const [selectedDay, setSelectedDay] = useState(1);
     const [dailyLeaderboard, setDailyLeaderboard] = useState({ 1: [], 2: [] });
+    const [competitorRanking, setCompetitorRanking] = useState([]);
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
@@ -85,6 +86,13 @@ export default function AdminPage() {
             ]);
             if (lb1Res.ok) { const data = await lb1Res.json(); setDailyLeaderboard(prev => ({ ...prev, 1: data.leaderboard || [] })); }
             if (lb2Res.ok) { const data = await lb2Res.json(); setDailyLeaderboard(prev => ({ ...prev, 2: data.leaderboard || [] })); }
+
+            // Fetch competitor rankings
+            const compRes = await fetch('/api/competitors', { cache: 'no-store' });
+            if (compRes.ok) { 
+                const data = await compRes.json(); 
+                setCompetitorRanking((data.competitors || []).sort((a, b) => b.totalPoints - a.totalPoints)); 
+            }
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -645,6 +653,36 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: 48 }}>
+                            <h2 className="card-title" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                👤 Classifica Singoli Concorrenti (Solo Admin)
+                            </h2>
+                            <p style={{marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)'}}>Punteggi totali accumulati da ogni singolo concorrente.</p>
+                            
+                            <div className="card" style={{ background: 'white', padding: 0, overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+                                        <tr>
+                                            <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '0.85rem' }}>Pos.</th>
+                                            <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '0.85rem' }}>Concorrente</th>
+                                            <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '0.85rem' }}>Tipo</th>
+                                            <th style={{ padding: '12px 20px', textAlign: 'right', fontSize: '0.85rem' }}>Punti Totali</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {competitorRanking.map((comp, idx) => (
+                                            <tr key={comp.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                                <td style={{ padding: '12px 20px', fontSize: '0.9rem' }}>{idx + 1}</td>
+                                                <td style={{ padding: '12px 20px', fontWeight: 'bold', fontSize: '0.9rem' }}>{comp.name}</td>
+                                                <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: 'var(--text-light)' }}>{comp.type}</td>
+                                                <td style={{ padding: '12px 20px', textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)' }}>{comp.totalPoints} pt</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

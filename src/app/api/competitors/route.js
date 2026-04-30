@@ -2,12 +2,31 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const day = searchParams.get('day');
+
         const competitors = await prisma.competitor.findMany({
+            include: {
+                scores: {
+                    where: day ? { day: parseInt(day) } : {},
+                    include: { bonusMalus: true }
+                }
+            },
             orderBy: { name: 'asc' },
         });
-        return NextResponse.json({ competitors });
+
+        // Calculate total points for each competitor
+        const competitorsWithPoints = competitors.map(c => {
+            const totalPoints = c.scores.reduce((sum, s) => sum + s.bonusMalus.points, 0);
+            return {
+                ...c,
+                totalPoints
+            };
+        });
+
+        return NextResponse.json({ competitors: competitorsWithPoints });
     } catch (error) {
         console.error('Error fetching competitors:', error);
         return NextResponse.json({ error: 'Errore nel recupero concorrenti' }, { status: 500 });

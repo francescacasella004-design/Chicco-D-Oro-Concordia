@@ -67,7 +67,11 @@ export default function AdminPage() {
                 fetch('/api/scores/pending', { cache: 'no-store' })
             ]);
 
-            if (compRes.ok) { const data = await compRes.json(); setCompetitors(data.competitors || []); }
+            if (compRes.ok) { 
+                const data = await compRes.json(); 
+                setCompetitors(data.competitors || []); 
+                setCompetitorRanking((data.competitors || []).sort((a, b) => b.totalPoints - a.totalPoints));
+            }
             if (bmRes.ok) { const data = await bmRes.json(); setBonusMalus(data.bonusMalus || []); }
             if (scoreRes.ok) { const data = await scoreRes.json(); setScoreHistory(data.scoreEvents || []); }
             if (annRes.ok) { const data = await annRes.json(); setAnnouncements(data.announcements || []); }
@@ -87,12 +91,7 @@ export default function AdminPage() {
             if (lb1Res.ok) { const data = await lb1Res.json(); setDailyLeaderboard(prev => ({ ...prev, 1: data.leaderboard || [] })); }
             if (lb2Res.ok) { const data = await lb2Res.json(); setDailyLeaderboard(prev => ({ ...prev, 2: data.leaderboard || [] })); }
 
-            // Fetch competitor rankings
-            const compRes = await fetch('/api/competitors', { cache: 'no-store' });
-            if (compRes.ok) { 
-                const data = await compRes.json(); 
-                setCompetitorRanking((data.competitors || []).sort((a, b) => b.totalPoints - a.totalPoints)); 
-            }
+
         } catch (error) {
             console.error('Error loading data:', error);
         }

@@ -122,6 +122,12 @@ export default function HomePage() {
               alt="Gennaro Bottone" 
               style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
             />
+            <img 
+              src="/logo-sweet.jpg" 
+              onError={(e) => { e.currentTarget.src = "/logo-sweet.png"; e.currentTarget.onerror = null; }} 
+              alt="Sweet Party Creation" 
+              style={{ maxHeight: '120px', maxWidth: '200px', objectFit: 'contain', borderRadius: '8px' }} 
+            />
           </div>
         </div>
       </section>

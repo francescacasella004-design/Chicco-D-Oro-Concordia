@@ -68,10 +68,41 @@ export default function ClassificaPage() {
             <section className="section">
                 <div className="container" style={{ maxWidth: 700 }}>
                     {(!resultsPublished && user?.role !== 'admin') ? (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">🔒</div>
-                            <h3>Classifica Non Pubblicata</h3>
-                            <p>I risultati verranno mostrati ufficialmente al termine dell'evento!</p>
+                        <div className="container" style={{ maxWidth: 600 }}>
+                            <div className="card" style={{ textAlign: 'center', marginBottom: 24, padding: 20 }}>
+                                <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
+                                <h3 style={{ margin: 0 }}>Squadre Partecipanti</h3>
+                                <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: 8 }}>
+                                    I punteggi verranno mostrati ufficialmente al termine dell'evento!
+                                </p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {[...leaderboard]
+                                    .sort((a, b) => a.teamName.localeCompare(b.teamName))
+                                    .map((entry) => (
+                                        <div key={entry.teamId} className="leaderboard-item" style={{ cursor: 'default' }}>
+                                            <div className="leaderboard-rank" style={{ opacity: 0.5, fontSize: '0.8rem' }}>
+                                                #
+                                            </div>
+                                            <div className="leaderboard-info">
+                                                <div className="leaderboard-team">{entry.teamName}</div>
+                                                <div className="leaderboard-player">
+                                                    <span>di <strong>{entry.playerName}</strong></span>
+                                                </div>
+                                            </div>
+                                            <div className="leaderboard-points" style={{ fontSize: '0.8rem', opacity: 0.5 }}>
+                                                ??? pt
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                                {leaderboard.length === 0 && (
+                                    <div style={{ textAlign: 'center', padding: 40, opacity: 0.5 }}>
+                                        Nessuna squadra ancora registrata.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : leaderboard.length === 0 ? (
                         <div className="empty-state">

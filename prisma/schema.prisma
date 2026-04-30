@@ -68,6 +68,7 @@ model ScoreEvent {
   competitorId Int
   bonusMalusId Int
   assignedById Int
+  day          Int        @default(1)
   createdAt    DateTime   @default(now())
   assignedBy   User       @relation("AssignedBy", fields: [assignedById], references: [id])
   bonusMalus   BonusMalus @relation(fields: [bonusMalusId], references: [id])
@@ -82,6 +83,7 @@ model PendingScoreEvent {
   bonusMalus    BonusMalus @relation(fields: [bonusMalusId], references: [id])
   assignedById  Int
   assignedBy    User       @relation("PendingAssignedBy", fields: [assignedById], references: [id])
+  day           Int        @default(1)
   createdAt     DateTime   @default(now())
 }
 

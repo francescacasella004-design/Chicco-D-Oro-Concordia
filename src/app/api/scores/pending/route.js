@@ -26,7 +26,7 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
         }
 
-        const { competitorId, bonusMalusId } = await request.json();
+        const { competitorId, bonusMalusId, day } = await request.json();
 
         if (!competitorId || !bonusMalusId) {
             return NextResponse.json(
@@ -40,6 +40,7 @@ export async function POST(request) {
                 competitorId,
                 bonusMalusId,
                 assignedById: user.userId,
+                day: day || 1,
             },
             include: {
                 competitor: true,

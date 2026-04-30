@@ -26,6 +26,8 @@ export default function AdminPage() {
     const [registrationOpen, setRegistrationOpen] = useState(true);
     const [resultsPublished, setResultsPublished] = useState(false);
     const [bmSearch, setBmSearch] = useState('');
+    const [selectedDay, setSelectedDay] = useState(1);
+    const [dailyLeaderboard, setDailyLeaderboard] = useState({ 1: [], 2: [] });
 
     // Edit/Delete State
     const [editingItem, setEditingItem] = useState(null); // { type: 'competitor' | 'bonus' | 'announcement', data: ... }
@@ -75,6 +77,14 @@ export default function AdminPage() {
                 setResultsPublished(data.resultsPublished);
             }
             if (pendingRes && pendingRes.ok) { const data = await pendingRes.json(); setPendingScores(data.pendingScores || []); }
+            
+            // Fetch daily leaderboards
+            const [lb1Res, lb2Res] = await Promise.all([
+                fetch('/api/leaderboard?day=1', { cache: 'no-store' }),
+                fetch('/api/leaderboard?day=2', { cache: 'no-store' })
+            ]);
+            if (lb1Res.ok) { const data = await lb1Res.json(); setDailyLeaderboard(prev => ({ ...prev, 1: data.leaderboard || [] })); }
+            if (lb2Res.ok) { const data = await lb2Res.json(); setDailyLeaderboard(prev => ({ ...prev, 2: data.leaderboard || [] })); }
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -118,6 +128,7 @@ export default function AdminPage() {
                 body: JSON.stringify({
                     competitorId: parseInt(competitorId),
                     bonusMalusId: parseInt(bmId),
+                    day: selectedDay
                 }),
             });
             if (res.ok) {
@@ -366,7 +377,6 @@ export default function AdminPage() {
             </div>
 
             <div className="card">
-                {/* === ASSEGNA PUNTEGGI === */}
                 {activeTab === 'assegna' && (
                     <div style={{ paddingBottom: '30vh' }}>
                         <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -388,6 +398,24 @@ export default function AdminPage() {
                                 </label>
                             </div>
                         </h2>
+
+                        <div className="card" style={{ marginBottom: 24, background: 'rgba(var(--primary-rgb), 0.05)', border: '1px solid var(--primary)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+                                <span style={{ fontWeight: 'bold' }}>📅 Seleziona Giorno:</span>
+                                <button 
+                                    className={`btn ${selectedDay === 1 ? 'btn-primary' : 'btn-secondary'}`} 
+                                    onClick={() => setSelectedDay(1)}
+                                >
+                                    Giorno 1
+                                </button>
+                                <button 
+                                    className={`btn ${selectedDay === 2 ? 'btn-primary' : 'btn-secondary'}`} 
+                                    onClick={() => setSelectedDay(2)}
+                                >
+                                    Giorno 2
+                                </button>
+                            </div>
+                        </div>
 
                         {currentCompetitorToScore ? (
                             <>
@@ -558,47 +586,67 @@ export default function AdminPage() {
                             </div>
                         </h2>
 
-                        <p style={{ color: 'var(--text-light)', marginBottom: 20 }}>
-                            Questi punteggi sono stati assegnati ma non sono ancora visibili nella classifica.
-                            Controllali e confermali per renderli ufficiali.
-                        </p>
+                        <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+                            {[1, 2, 3].map(i => {
+                                const admin = users.filter(u => u.role === 'admin')[i-1];
+                                if (!admin && i > 1) return <div key={i} className="card" style={{opacity: 0.5, border: '1px dashed var(--border)', textAlign: 'center', padding: 40}}>Slot Admin {i} Libero</div>;
+                                
+                                const adminId = admin ? admin.id : -1;
+                                const adminName = admin ? admin.name : `Admin ${i}`;
+                                const adminScores = pendingScores.filter(ps => ps.assignedBy.id === adminId);
 
-                        {pendingScores.length > 0 ? (
-                            <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-                                {Array.from(new Set(pendingScores.map(ps => ps.assignedBy.id))).map(adminId => {
-                                    const adminScores = pendingScores.filter(ps => ps.assignedBy.id === adminId);
-                                    const adminName = adminScores[0].assignedBy.name;
-                                    return (
-                                        <div key={adminId} className="card" style={{ background: 'var(--background)', border: '1px solid var(--border)' }}>
-                                            <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 15, display: 'flex', justifyContent: 'space-between' }}>
-                                                <span>👤 {adminName}</span>
-                                                <span className="tag">{adminScores.length}</span>
-                                            </h3>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                                {adminScores.map(ps => (
-                                                    <div key={ps.id} className="score-history-item" style={{ padding: '8px 12px', fontSize: '0.9rem' }}>
-                                                        <div style={{ flex: 1 }}>
-                                                            <strong>{ps.competitor.name}</strong>
-                                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
-                                                                {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
-                                                            </div>
-                                                        </div>
-                                                        <div style={{ display: 'flex', gap: 5 }}>
-                                                            <button className="btn btn-sm btn-danger" onClick={() => handleDeletePending(ps.id)}>🗑️</button>
-                                                            <button className="btn btn-sm btn-success" onClick={() => handleConfirmScores([ps.id])}>✅</button>
-                                                        </div>
+                                return (
+                                    <div key={i} className="card" style={{ background: 'var(--background)', border: '2px solid var(--primary)' }}>
+                                        <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 15, display: 'flex', justifyContent: 'space-between', color: 'var(--primary)' }}>
+                                            <span>👤 {adminName}</span>
+                                            <span className="tag" style={{background: 'var(--primary)', color: 'white'}}>{adminScores.length}</span>
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '400px', overflowY: 'auto' }}>
+                                            {adminScores.length > 0 ? adminScores.map(ps => (
+                                                <div key={ps.id} className="score-history-item" style={{ padding: '8px 12px', fontSize: '0.85rem', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                                                        <strong>{ps.competitor.name}</strong>
+                                                        <span className="tag" style={{fontSize: '0.7rem'}}>G{ps.day}</span>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
+                                                            {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
+                                                        </div>
+                                                        <button className="btn btn-sm btn-danger" style={{padding: '2px 6px'}} onClick={() => handleDeletePending(ps.id)}>🗑️</button>
+                                                    </div>
+                                                </div>
+                                            )) : <div style={{textAlign: 'center', padding: 20, opacity: 0.5}}>Nessun punto inserito</div>}
                                         </div>
-                                    );
-                                })}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{ marginTop: 48 }}>
+                            <h2 className="card-title" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                🏆 Classifiche Parziali (Solo Admin)
+                            </h2>
+                            <p style={{marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)'}}>Qui puoi vedere come sarebbe la classifica se confermassi i punti ora. Non visibile ai giocatori.</p>
+                            
+                            <div className="grid grid-2" style={{ gap: 24 }}>
+                                {[1, 2].map(day => (
+                                    <div key={day} className="card" style={{ background: 'white' }}>
+                                        <h3 style={{ marginBottom: 16, textAlign: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10 }}>
+                                            ☀️ Classifica Giorno {day}
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            {dailyLeaderboard[day] && dailyLeaderboard[day].slice(0, 10).map((team, idx) => (
+                                                <div key={team.teamId} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6 }}>
+                                                    <span>{idx + 1}. <strong>{team.teamName}</strong></span>
+                                                    <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{team.totalPoints} pt</span>
+                                                </div>
+                                            ))}
+                                            {(!dailyLeaderboard[day] || dailyLeaderboard[day].length === 0) && <div style={{textAlign: 'center', opacity: 0.5}}>Ancora nessun dato</div>}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ) : (
-                            <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>
-                                Nessun punteggio in attesa di revisione.
-                            </div>
-                        )}
+                        </div>
                     </div>
                 )}
 

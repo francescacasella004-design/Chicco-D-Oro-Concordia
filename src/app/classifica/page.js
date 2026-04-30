@@ -1,21 +1,25 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/components/AuthContext';
 
 export default function ClassificaPage() {
+    const { user } = useAuth();
     const [leaderboard, setLeaderboard] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedTeam, setExpandedTeam] = useState(null);
     const [resultsPublished, setResultsPublished] = useState(false);
+    const [viewDay, setViewDay] = useState('total'); // 'total', '1', '2'
 
     useEffect(() => {
         fetchLeaderboard();
         const interval = setInterval(fetchLeaderboard, 15000);
         return () => clearInterval(interval);
-    }, []);
+    }, [viewDay]);
 
     async function fetchLeaderboard() {
         try {
-            const res = await fetch('/api/leaderboard');
+            const url = viewDay === 'total' ? '/api/leaderboard' : `/api/leaderboard?day=${viewDay}`;
+            const res = await fetch(url);
             const data = await res.json();
             setLeaderboard(data.leaderboard || []);
             setResultsPublished(data.resultsPublished || false);
@@ -48,11 +52,22 @@ export default function ClassificaPage() {
         <>
             <div className="page-header">
                 <h1>🏆 Classifica</h1>
-                <p>{resultsPublished ? 'Risultati Finali' : 'Aggiornamento automatico ogni 15 secondi'}</p>
+                <p>{resultsPublished ? 'Risultati Finali' : (user?.role === 'admin' ? '👀 Anteprima Admin' : 'Aggiornamento automatico ogni 15 secondi')}</p>
             </div>
+            
+            {(resultsPublished || user?.role === 'admin') && (
+                <div className="container" style={{ maxWidth: 700, marginTop: 24, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                        <button className={`btn btn-sm ${viewDay === 'total' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setViewDay('total')}>Totale</button>
+                        <button className={`btn btn-sm ${viewDay === '1' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setViewDay('1')}>Giorno 1</button>
+                        <button className={`btn btn-sm ${viewDay === '2' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setViewDay('2')}>Giorno 2</button>
+                    </div>
+                </div>
+            )}
+
             <section className="section">
                 <div className="container" style={{ maxWidth: 700 }}>
-                    {!resultsPublished ? (
+                    {(!resultsPublished && user?.role !== 'admin') ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">🔒</div>
                             <h3>Classifica Non Pubblicata</h3>

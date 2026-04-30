@@ -9,6 +9,9 @@ export async function GET(request) {
         // Se non sono pubblicati, permetti la visione solo se l'utente è admin
         // (Per semplicità qui carichiamo sempre ma potremmo filtrare)
         
+        const { searchParams } = new URL(request.url);
+        const day = searchParams.get('day');
+
         // Get all teams with their competitors and captain
         const teams = await prisma.team.findMany({
             include: {
@@ -18,6 +21,7 @@ export async function GET(request) {
                         competitor: {
                             include: {
                                 scores: {
+                                    where: day ? { day: parseInt(day) } : {},
                                     include: { bonusMalus: true },
                                 },
                             },

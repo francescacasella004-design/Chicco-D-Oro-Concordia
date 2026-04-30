@@ -31,6 +31,7 @@ export async function POST(request) {
                     competitorId: ps.competitorId,
                     bonusMalusId: ps.bonusMalusId,
                     assignedById: ps.assignedById,
+                    day: ps.day,
                     createdAt: ps.createdAt, // Manteniamo la data originale di assegnazione
                 }))
             }),

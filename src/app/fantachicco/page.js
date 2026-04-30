@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthContext';
 
@@ -195,7 +195,7 @@ function ComeSiGiocaSection() {
 }
 
 /* ===== CLASSIFICA ===== */
-import { useEffect } from 'react';
+
 
 function ClassificaSection() {
     const [leaderboard, setLeaderboard] = useState([]);

@@ -71,7 +71,7 @@ export default function ClassificaPage() {
                         <div className="container" style={{ maxWidth: 600 }}>
                             <div className="card" style={{ textAlign: 'center', marginBottom: 24, padding: 20 }}>
                                 <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
-                                <h3 style={{ margin: 0 }}>Squadre Partecipanti</h3>
+                                <h3 style={{ margin: 0 }}>Elenco Squadre Partecipanti</h3>
                                 <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: 8 }}>
                                     I punteggi verranno mostrati ufficialmente al termine dell'evento!
                                 </p>

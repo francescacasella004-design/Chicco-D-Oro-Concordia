@@ -67,7 +67,7 @@ export default function ClassificaPage() {
 
             <section className="section">
                 <div className="container" style={{ maxWidth: 700 }}>
-                    {(!resultsPublished && user?.role !== 'admin') ? (
+                    {!resultsPublished ? (
                         <div className="container" style={{ maxWidth: 600 }}>
                             <div className="card" style={{ textAlign: 'center', marginBottom: 24, padding: 20 }}>
                                 <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
@@ -92,7 +92,7 @@ export default function ClassificaPage() {
                                                 </div>
                                             </div>
                                             <div className="leaderboard-points" style={{ fontSize: '0.8rem', opacity: 0.5 }}>
-                                                ??? pt
+                                                pt
                                             </div>
                                         </div>
                                     ))

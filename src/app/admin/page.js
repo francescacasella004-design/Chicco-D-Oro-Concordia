@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 
-const RAGAZZE_ANIMATRICI = ['Sara Femia', 'Bruna Barashini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia'];
+const RAGAZZE_ANIMATRICI = ['Bruna Barashini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia', 'Paola Fenderico', 'Sara Baraschini', 'Ilaria Salvi'];
 
 const SCALETTA = [
     { title: '1 Canzone', participants: ['Giulia Marigliano'], type: 'individual' },
@@ -138,6 +138,44 @@ export default function AdminPage() {
     const showMessage = (type, text) => {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 3000);
+    };
+
+    const renderBonusMalusList = (isBonus, participants) => {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {bonusMalus
+                    .filter(bm => isBonus ? bm.points > 0 : bm.points < 0)
+                    .filter(bm => bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
+                    .sort((a, b) => isBonus ? b.points - a.points : a.points - b.points)
+                    .map(bm => (
+                        <button 
+                            key={bm.id} 
+                            className="btn btn-secondary btn-sm" 
+                            style={{ 
+                                width: '100%', 
+                                justifyContent: 'flex-start', 
+                                textAlign: 'left', 
+                                height: 'auto', 
+                                padding: '6px 8px',
+                                fontSize: '0.75rem',
+                                borderLeft: `3px solid ${isBonus ? 'var(--success)' : 'var(--danger)'}`
+                            }}
+                            onClick={() => {
+                                const ids = participants
+                                    .map(pName => competitors.find(c => c.name.toLowerCase().includes(pName.toLowerCase()))?.id)
+                                    .filter(id => id !== undefined);
+                                handleAssignScore(null, bm.id, ids);
+                            }}
+                        >
+                            <span style={{ fontWeight: 'bold', color: isBonus ? 'var(--success)' : 'var(--danger)', minWidth: '30px' }}>
+                                {isBonus ? '+' : ''}{bm.points}
+                            </span>
+                            <span style={{ marginLeft: 4 }}>{bm.description}</span>
+                        </button>
+                    ))
+                }
+            </div>
+        );
     };
 
     const handleToggleRegistration = async () => {
@@ -508,28 +546,14 @@ export default function AdminPage() {
                             </div>
 
                             {/* DETTAGLIO ASSEGNAZIONE */}
-                            <div>
+                            <div style={{ flex: 1 }}>
                                 {selectedPerformance ? (
-                                    <div className="card" style={{ border: '2px solid var(--primary)', position: 'sticky', top: 20 }}>
-                                        <h3 style={{ color: 'var(--primary)', marginBottom: 4 }}>{selectedPerformance.title}</h3>
-                                        <p style={{ fontSize: '0.9rem', marginBottom: 20, opacity: 0.8 }}>Partecipanti: {selectedPerformance.participants.join(', ')}</p>
-                                        
-                                        <div style={{ marginBottom: 24 }}>
-                                            <h4 style={{ fontSize: '0.85rem', marginBottom: 10, textTransform: 'uppercase', opacity: 0.6 }}>Assegna a:</h4>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                                {selectedPerformance.type === 'group' ? (
-                                                    <div className="tag tag-category" style={{ padding: '8px 12px' }}>Tutto il Gruppo ({selectedPerformance.participants.length})</div>
-                                                ) : (
-                                                    selectedPerformance.participants.map(name => {
-                                                        const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
-                                                        return (
-                                                            <div key={name} className="tag" style={{ padding: '8px 12px', background: comp ? 'var(--surface)' : '#fee2e2', border: '1px solid var(--border)' }}>
-                                                                {name} {!comp && '⚠️ (Non trovato)'}
-                                                            </div>
-                                                        );
-                                                    })
-                                                )}
-                                            </div>
+                                    <div className="card" style={{ border: '2px solid var(--primary)', position: 'sticky', top: 20, maxHeight: '85vh', overflowY: 'auto' }}>
+                                        <div style={{ marginBottom: 16 }}>
+                                            <h3 style={{ color: 'var(--primary)', margin: 0 }}>{selectedPerformance.title}</h3>
+                                            <span className={`tag ${selectedPerformance.type === 'group' ? 'tag-category' : ''}`} style={{ fontSize: '0.75rem', marginTop: 4 }}>
+                                                {selectedPerformance.type === 'group' ? 'PUNTEGGIO DI GRUPPO' : 'PUNTEGGI INDIVIDUALI'}
+                                            </span>
                                         </div>
 
                                         <input 
@@ -538,56 +562,52 @@ export default function AdminPage() {
                                             placeholder="🔍 Cerca Bonus/Malus..." 
                                             value={bmSearch}
                                             onChange={(e) => setBmSearch(e.target.value)}
-                                            style={{ marginBottom: 16 }}
+                                            style={{ marginBottom: 20 }}
                                         />
 
-                                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                                            <div className="grid grid-2" style={{ gap: 12 }}>
-                                                <div>
-                                                    <h5 style={{ color: 'var(--success)', marginBottom: 8 }}>🟢 Bonus</h5>
-                                                    {bonusMalus.filter(bm => bm.points > 0 && bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
-                                                        .sort((a, b) => b.points - a.points).map(bm => (
-                                                        <button 
-                                                            key={bm.id} 
-                                                            className="btn btn-secondary btn-sm" 
-                                                            style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left', marginBottom: 4, height: 'auto', padding: '8px' }}
-                                                            onClick={() => {
-                                                                const ids = selectedPerformance.participants
-                                                                    .map(name => competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()))?.id)
-                                                                    .filter(id => id !== undefined);
-                                                                handleAssignScore(null, bm.id, ids);
-                                                            }}
-                                                        >
-                                                            <span style={{ fontWeight: 'bold', color: 'var(--success)', minWidth: '35px' }}>+{bm.points}</span>
-                                                            <span style={{ fontSize: '0.8rem', marginLeft: 4 }}>{bm.description}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                                <div>
-                                                    <h5 style={{ color: 'var(--danger)', marginBottom: 8 }}>🔴 Malus</h5>
-                                                    {bonusMalus.filter(bm => bm.points < 0 && bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
-                                                        .sort((a, b) => a.points - b.points).map(bm => (
-                                                        <button 
-                                                            key={bm.id} 
-                                                            className="btn btn-secondary btn-sm" 
-                                                            style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left', marginBottom: 4, height: 'auto', padding: '8px' }}
-                                                            onClick={() => {
-                                                                const ids = selectedPerformance.participants
-                                                                    .map(name => competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()))?.id)
-                                                                    .filter(id => id !== undefined);
-                                                                handleAssignScore(null, bm.id, ids);
-                                                            }}
-                                                        >
-                                                            <span style={{ fontWeight: 'bold', color: 'var(--danger)', minWidth: '35px' }}>{bm.points}</span>
-                                                            <span style={{ fontSize: '0.8rem', marginLeft: 4 }}>{bm.description}</span>
-                                                        </button>
-                                                    ))}
+                                        {selectedPerformance.type === 'group' ? (
+                                            /* MODALITÀ GRUPPO: UNA SOLA LISTA PER TUTTI */
+                                            <div style={{ background: 'rgba(var(--primary-rgb), 0.03)', padding: 16, borderRadius: 12 }}>
+                                                <h4 style={{ marginBottom: 12, fontSize: '0.9rem' }}>👥 Gruppo: {selectedPerformance.participants.join(', ')}</h4>
+                                                <div className="grid grid-2" style={{ gap: 12 }}>
+                                                    <div>
+                                                        <h5 style={{ color: 'var(--success)', marginBottom: 8, fontSize: '0.8rem' }}>🟢 Bonus Gruppo</h5>
+                                                        {renderBonusMalusList(true, selectedPerformance.participants)}
+                                                    </div>
+                                                    <div>
+                                                        <h5 style={{ color: 'var(--danger)', marginBottom: 8, fontSize: '0.8rem' }}>🔴 Malus Gruppo</h5>
+                                                        {renderBonusMalusList(false, selectedPerformance.participants)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            /* MODALITÀ INDIVIDUALE: UNA LISTA PER OGNI BAMBINO */
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                                {selectedPerformance.participants.map(name => {
+                                                    const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                                                    return (
+                                                        <div key={name} style={{ background: 'var(--surface)', padding: 16, borderRadius: 12, border: '1px solid var(--border)' }}>
+                                                            <h4 style={{ marginBottom: 12, color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
+                                                                👤 {name} {!comp && <span style={{ color: 'var(--danger)', fontSize: '0.7rem' }}>⚠️ Non in DB</span>}
+                                                            </h4>
+                                                            <div className="grid grid-2" style={{ gap: 12 }}>
+                                                                <div>
+                                                                    <h5 style={{ color: 'var(--success)', marginBottom: 8, fontSize: '0.75rem' }}>🟢 Bonus {name.split(' ')[0]}</h5>
+                                                                    {renderBonusMalusList(true, [name])}
+                                                                </div>
+                                                                <div>
+                                                                    <h5 style={{ color: 'var(--danger)', marginBottom: 8, fontSize: '0.75rem' }}>🔴 Malus {name.split(' ')[0]}</h5>
+                                                                    {renderBonusMalusList(false, [name])}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
-                                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)', borderRadius: 12, opacity: 0.5 }}>
+                                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)', borderRadius: 12, opacity: 0.5, minHeight: '300px' }}>
                                         Seleziona un\'esibizione dalla lista a sinistra
                                     </div>
                                 )}

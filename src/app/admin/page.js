@@ -78,6 +78,7 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState('scaletta'); // scaletta, organizzatori, revisione, concorrenti, regole, storico, avvisi
     const [selectedPerformance, setSelectedPerformance] = useState(null);
     const [extraSearch, setExtraSearch] = useState('');
+    const [lastConfirmedIds, setLastConfirmedIds] = useState([]);
 
     // Data State
     const [competitors, setCompetitors] = useState([]);
@@ -399,6 +400,7 @@ export default function AdminPage() {
             });
             if (res.ok) {
                 showMessage('success', `${ids.length} punteggi confermati ufficialmente!`);
+                setLastConfirmedIds(ids); 
                 fetchData();
             } else {
                 showMessage('error', 'Errore nella conferma');
@@ -408,6 +410,31 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleUndoConfirmation = async () => {
+        if (!lastConfirmedIds.length) return;
+        if (!confirm('Vuoi davvero annullare l\'ultima conferma? I punti torneranno provvisori.')) return;
+        
+        setLoading(true);
+        try {
+            const res = await fetch('/api/scores/undo-confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: lastConfirmedIds }),
+            });
+            
+            if (res.ok) {
+                showMessage('success', 'Conferma annullata! I punti sono di nuovo provvisori.');
+                setLastConfirmedIds([]);
+                fetchData();
+                setActiveTab('scaletta');
+            } else {
+                const data = await res.json();
+                showMessage('error', data.error || 'Impossibile annullare');
+            }
+        } catch (e) { showMessage('error', 'Errore durante l\'annullamento'); }
+        finally { setLoading(false); }
     };
 
     const handlePublishResults = async () => {
@@ -740,8 +767,20 @@ export default function AdminPage() {
                 {activeTab === 'revisione' && (
                     <div>
                         <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>👀 Revisione Punteggi</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+                                <button className="btn btn-sm btn-secondary" onClick={() => setActiveTab('scaletta')}>⬅️ Scaletta</button>
+                                <span>👀 Revisione Punteggi</span>
+                            </div>
                             <div style={{ display: 'flex', gap: 10 }}>
+                                {lastConfirmedIds.length > 0 && (
+                                    <button
+                                        className="btn btn-sm"
+                                        style={{ background: '#f1c40f', color: '#000', fontWeight: 'bold' }}
+                                        onClick={handleUndoConfirmation}
+                                    >
+                                        ↩️ Annulla Ultima Conferma
+                                    </button>
+                                )}
                                 <button
                                     className="btn btn-sm btn-danger"
                                     onClick={() => { if (confirm('Svuotare tutti i punteggi in attesa?')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}

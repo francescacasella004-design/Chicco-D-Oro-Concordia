@@ -855,9 +855,14 @@ export default function AdminPage() {
                                         </h3>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             {dailyLeaderboard[day] && dailyLeaderboard[day].slice(0, 10).map((team, idx) => (
-                                                <div key={team.teamId} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6 }}>
-                                                    <span>{idx + 1}. <strong>{team.teamName}</strong></span>
-                                                    <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{team.totalPoints} pt</span>
+                                                <div key={team.teamId} style={{ display: 'flex', flexDirection: 'column', padding: '10px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6, marginBottom: 4 }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <span>{idx + 1}. <strong>{team.teamName}</strong></span>
+                                                        <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{team.totalPoints} pt</span>
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: 2 }}>
+                                                        👑 Capitano: {team.competitors.find(c => c.isCaptain)?.name || 'Nessuno'}
+                                                    </div>
                                                 </div>
                                             ))}
                                             {(!dailyLeaderboard[day] || dailyLeaderboard[day].length === 0) && <div style={{textAlign: 'center', opacity: 0.5}}>Ancora nessun dato</div>}
@@ -1076,7 +1081,7 @@ export default function AdminPage() {
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         <button
                                             className="btn btn-sm btn-secondary"
-                                            onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails || [] })}
+                                            onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails || [], captainId: u.captainId })}
                                             title="Vedi Squadra"
                                         >
                                             👁️ Vedi Squadra
@@ -1172,21 +1177,25 @@ export default function AdminPage() {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {(viewingTeam.competitors && viewingTeam.competitors.length > 0) ? viewingTeam.competitors.map(c => (
-                                <div key={c.id} style={{
-                                    padding: '8px 12px',
-                                    background: 'var(--background)',
-                                    borderRadius: 8,
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    border: '1px solid var(--border)'
-                                }}>
-                                    <div>
-                                        <strong>{c.name}</strong>
-                                        <div style={{ fontSize: '0.8em', opacity: 0.7 }}>{c.type}</div>
+                                    <div style={{
+                                        padding: '12px',
+                                        background: c.id === viewingTeam.captainId ? 'rgba(var(--primary-rgb), 0.1)' : 'var(--background)',
+                                        borderRadius: 8,
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        border: c.id === viewingTeam.captainId ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                        position: 'relative'
+                                    }}>
+                                        <div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <strong>{c.name}</strong>
+                                                {c.id === viewingTeam.captainId && <span className="tag tag-bonus" style={{ fontSize: '0.6rem', padding: '2px 4px' }}>👑 CAPITANO</span>}
+                                            </div>
+                                            <div style={{ fontSize: '0.8em', opacity: 0.7 }}>{c.type}</div>
+                                        </div>
+                                        <div style={{ fontWeight: 'bold' }}>{c.cost} cr</div>
                                     </div>
-                                    <div style={{ fontWeight: 'bold' }}>{c.cost} cr</div>
-                                </div>
                             )) : <p>Nessun giocatore in squadra</p>}
                         </div>
 

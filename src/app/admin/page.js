@@ -77,6 +77,7 @@ export default function AdminPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('scaletta'); // scaletta, organizzatori, revisione, concorrenti, regole, storico, avvisi
     const [selectedPerformance, setSelectedPerformance] = useState(null);
+    const [extraSearch, setExtraSearch] = useState('');
 
     // Data State
     const [competitors, setCompetitors] = useState([]);
@@ -568,6 +569,28 @@ export default function AdminPage() {
                         <div className="admin-grid" style={{ gridTemplateColumns: '220px 1fr', gap: 24 }}>
                             {/* LISTA SCALETTA */}
                             <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: 10, borderRight: '1px solid var(--border)' }}>
+                                {/* TASTO EXTRA / TUTTI */}
+                                <div 
+                                    onClick={() => setSelectedPerformance({ title: '✨ EXTRA / TUTTI', type: 'extra' })}
+                                    style={{ 
+                                        padding: '12px', 
+                                        marginBottom: 12, 
+                                        borderRadius: 8, 
+                                        cursor: 'pointer',
+                                        border: '2px solid var(--primary)',
+                                        background: selectedPerformance?.title === '✨ EXTRA / TUTTI' ? 'var(--primary)' : 'rgba(var(--primary-rgb), 0.1)',
+                                        color: selectedPerformance?.title === '✨ EXTRA / TUTTI' ? 'white' : 'var(--primary)',
+                                        textAlign: 'center',
+                                        fontWeight: '900',
+                                        fontSize: '0.9rem',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    }}
+                                >
+                                    🔍 EXTRA / TUTTI
+                                </div>
+
+                                <div style={{ height: '1px', background: 'var(--border)', marginBottom: 12 }}></div>
+
                                 {SCALETTA[selectedDay]?.map((perf, idx) => (
                                     <div 
                                         key={idx} 
@@ -613,7 +636,55 @@ export default function AdminPage() {
                                             style={{ marginBottom: 20 }}
                                         />
 
-                                        {selectedPerformance.type === 'group' ? (
+                                        {selectedPerformance.type === 'extra' ? (
+                                            /* MODALITÀ EXTRA: CERCA TRA TUTTI I CONCORRENTI */
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                                <div style={{ background: 'rgba(var(--primary-rgb), 0.05)', padding: 16, borderRadius: 12 }}>
+                                                    <h4 style={{ marginBottom: 12 }}>🔍 Cerca Concorrente Fuori Scaletta:</h4>
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-input" 
+                                                        placeholder="Inserisci il nome (es. Giulia...)" 
+                                                        value={extraSearch}
+                                                        onChange={(e) => setExtraSearch(e.target.value)}
+                                                        style={{ marginBottom: 16 }}
+                                                    />
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: '200px', overflowY: 'auto', padding: 4 }}>
+                                                        {competitors
+                                                            .filter(c => c.name.toLowerCase().includes(extraSearch.toLowerCase()))
+                                                            .sort((a, b) => a.name.localeCompare(b.name))
+                                                            .map(c => (
+                                                                <button 
+                                                                    key={c.id} 
+                                                                    className={`btn btn-sm ${selectedPerformance.participants?.includes(c.name) ? 'btn-primary' : 'btn-secondary'}`}
+                                                                    onClick={() => setSelectedPerformance({ ...selectedPerformance, participants: [c.name] })}
+                                                                >
+                                                                    {c.name}
+                                                                </button>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                {selectedPerformance.participants?.[0] && (
+                                                    <div style={{ background: 'var(--surface)', padding: 20, borderRadius: 12, border: '2px solid var(--primary)' }}>
+                                                        <h4 style={{ marginBottom: 16, color: 'var(--primary)', borderBottom: '2px solid var(--border)', paddingBottom: 10 }}>
+                                                            ✨ Assegna a: {selectedPerformance.participants[0]}
+                                                        </h4>
+                                                        <div className="grid grid-2" style={{ gap: 16 }}>
+                                                            <div>
+                                                                <h5 style={{ color: 'var(--success)', marginBottom: 10 }}>🟢 Bonus</h5>
+                                                                {renderBonusMalusList(true, [selectedPerformance.participants[0]])}
+                                                            </div>
+                                                            <div>
+                                                                <h5 style={{ color: 'var(--danger)', marginBottom: 10 }}>🔴 Malus</h5>
+                                                                {renderBonusMalusList(false, [selectedPerformance.participants[0]])}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : selectedPerformance.type === 'group' ? (
                                             /* MODALITÀ GRUPPO: UNA SOLA LISTA PER TUTTI */
                                             <div style={{ background: 'rgba(var(--primary-rgb), 0.03)', padding: 16, borderRadius: 12 }}>
                                                 <h4 style={{ marginBottom: 12, fontSize: '0.9rem' }}>👥 Gruppo: {selectedPerformance.participants.join(', ')}</h4>

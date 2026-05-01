@@ -5,40 +5,72 @@ import { useRouter } from 'next/navigation';
 
 const RAGAZZE_ANIMATRICI = ['Bruna Baraschini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia', 'Paola Fenderico', 'Sara Baraschini', 'Ilaria Salvi'];
 
-const SCALETTA = [
-    { title: '1 Canzone', participants: ['Giulia Marigliano'], type: 'individual' },
-    { title: '2 Canzone', participants: ['Melissa Sorrentino', 'Gioia Capuozzo'], type: 'individual' },
-    { title: '3 Canzone', participants: ['Ginevra Ragosta', 'Greta D’Amico'], type: 'individual' },
-    { title: '4 Canzone', participants: ['Sara Femia'], type: 'individual' },
-    { title: 'Ballo: Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
-    { title: '5 Canzone', participants: ['Roberto Imperatrice'], type: 'individual' },
-    { title: '6 Canzone', participants: ['Simona Loffredo'], type: 'individual' },
-    { title: '7 Canzone', participants: ['Alessia Ruocco'], type: 'individual' },
-    { title: '8 Canzone', participants: ['Bruna Baraschini'], type: 'individual' },
-    { title: 'Sketch: Alessia, Gabriele, Luigi', participants: ['Alessia Ruocco', 'Gabriele Piccolo', 'Luigi Bianco'], type: 'individual' },
-    { title: 'Ballo: Gruppo Gaia', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
-    { title: '9 Canzone', participants: ['Conny Barnaba'], type: 'individual' },
-    { title: '10 Canzone', participants: ['Ambra Girone'], type: 'individual' },
-    { title: '11 Canzone', participants: ['Giorgia Ciccone', 'Mattia Sarpa', 'Mayra Sarpa'], type: 'individual' },
-    { title: '12 Canzone', participants: ['Giorgia Marigliano'], type: 'individual' },
-    { title: '13 Canzone', participants: ['Lucia De Martino', 'Anna Martone'], type: 'individual' },
-    { title: 'Ballo Mary Mola', participants: ['Aurora Gherardi', 'Federica Ruocco', 'Marta Catello', 'Melissa Sorrentino', 'Sophia Calemma', 'Benedetta Bracale', 'Greta D’Amico', 'Gioiavittoria', 'Conny Barnaba', 'Aurora Mazza', 'Gioia Capuozzo'], type: 'group' },
-    { title: '14 Canzone', participants: ['Gaia Ciccone'], type: 'individual' },
-    { title: '15 Canzone', participants: ['Luigi Bianco', 'Sasy Ragosta'], type: 'individual' },
-    { title: '16 Canzone', participants: ['Aurora Gherardi'], type: 'individual' },
-    { title: '17 Canzone', participants: ['Maria Mola'], type: 'individual' },
-    { title: 'Sketch Vittoria e Sasy', participants: ['Vittoria De Rosa', 'Sasy Ragosta'], type: 'individual' },
-    { title: 'Ballo: Gruppo Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
-    { title: '18 Canzone', participants: ['Bianca Buonadosa', 'Lavinia Foria'], type: 'individual' },
-    { title: '19 Canzone', participants: ['Marta Catello', 'Sophia Calemma'], type: 'individual' },
-    { title: '20 Canzone', participants: ['Benedetta Bracale'], type: 'individual' },
-    { title: '21 Canzone', participants: ['Eliana'], type: 'individual' },
-    { title: 'Ballo Sara Fierro', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
-    { title: '22 Canzone', participants: ['Giuseppe Montella'], type: 'individual' },
-    { title: '23 Canzone', participants: ['Vittoria De Rosa'], type: 'individual' },
-    { title: '24 Canzone', participants: ['Aurora Oncia'], type: 'individual' },
-    { title: '25 Canzone', participants: ['Vittoria Femia'], type: 'individual' },
-];
+const SCALETTA = {
+    1: [
+        { title: '1 Canzone', participants: ['Giulia Marigliano'], type: 'individual' },
+        { title: '2 Canzone', participants: ['Melissa Sorrentino', 'Gioia Capuozzo'], type: 'individual' },
+        { title: '3 Canzone', participants: ['Ginevra Ragosta', 'Greta D’Amico'], type: 'individual' },
+        { title: '4 Canzone', participants: ['Sara Femia'], type: 'individual' },
+        { title: 'Ballo: Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+        { title: '5 Canzone', participants: ['Roberto Imperatrice'], type: 'individual' },
+        { title: '6 Canzone', participants: ['Simona Loffredo'], type: 'individual' },
+        { title: '7 Canzone', participants: ['Alessia Ruocco'], type: 'individual' },
+        { title: '8 Canzone', participants: ['Bruna Baraschini'], type: 'individual' },
+        { title: 'Sketch: Alessia, Gabriele, Luigi', participants: ['Alessia Ruocco', 'Gabriele Piccolo', 'Luigi Bianco'], type: 'individual' },
+        { title: 'Ballo: Gruppo Gaia', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
+        { title: '9 Canzone', participants: ['Conny Barnaba'], type: 'individual' },
+        { title: '10 Canzone', participants: ['Ambra Girone'], type: 'individual' },
+        { title: '11 Canzone', participants: ['Giorgia Ciccone', 'Mattia Sarpa', 'Mayra Sarpa'], type: 'individual' },
+        { title: '12 Canzone', participants: ['Giorgia Marigliano'], type: 'individual' },
+        { title: '13 Canzone', participants: ['Lucia De Martino', 'Anna Martone'], type: 'individual' },
+        { title: 'Ballo Mary Mola', participants: ['Aurora Gherardi', 'Federica Ruocco', 'Marta Catello', 'Melissa Sorrentino', 'Sophia Calemma', 'Benedetta Bracale', 'Greta D’Amico', 'Gioiavittoria', 'Conny Barnaba', 'Aurora Mazza', 'Gioia Capuozzo'], type: 'group' },
+        { title: '14 Canzone', participants: ['Gaia Ciccone'], type: 'individual' },
+        { title: '15 Canzone', participants: ['Luigi Bianco', 'Sasy Ragosta'], type: 'individual' },
+        { title: '16 Canzone', participants: ['Aurora Gherardi'], type: 'individual' },
+        { title: '17 Canzone', participants: ['Maria Mola'], type: 'individual' },
+        { title: 'Sketch Vittoria e Sasy', participants: ['Vittoria De Rosa', 'Sasy Ragosta'], type: 'individual' },
+        { title: 'Ballo: Gruppo Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+        { title: '18 Canzone', participants: ['Bianca Buonadosa', 'Lavinia Foria'], type: 'individual' },
+        { title: '19 Canzone', participants: ['Marta Catello', 'Sophia Calemma'], type: 'individual' },
+        { title: '20 Canzone', participants: ['Benedetta Bracale'], type: 'individual' },
+        { title: '21 Canzone', participants: ['Eliana'], type: 'individual' },
+        { title: 'Ballo Sara Fierro', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
+        { title: '22 Canzone', participants: ['Giuseppe Montella'], type: 'individual' },
+        { title: '23 Canzone', participants: ['Vittoria De Rosa'], type: 'individual' },
+        { title: '24 Canzone', participants: ['Aurora Oncia'], type: 'individual' },
+        { title: '25 Canzone', participants: ['Vittoria Femia'], type: 'individual' },
+    ],
+    2: [
+        { title: 'Presentazione', participants: ['Vincenzo Duca', 'Emanuele Fierro'], type: 'individual' },
+        { title: 'Ballo: Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+        { title: '1 Canzone', participants: ['Anna Martone', 'Gaia Ciccone', 'Benedetta', 'Suor Barbara'], type: 'individual' },
+        { title: '2 Canzone', participants: ['Sasy Ragosta', 'Don Giorgio', 'Piero'], type: 'individual' },
+        { title: '3 Canzone', participants: ['Conny Barnaba', 'Giorgia Ciccone'], type: 'individual' },
+        { title: 'Sketch', participants: ['Greta De Maria', 'Mariafrancesca Aloise', 'Carmine Raia'], type: 'individual' },
+        { title: 'Ballo Mary Mola', participants: ['Mary Mola'], type: 'group' },
+        { title: '4 Canzone', participants: ['Roberto Imperatrice', 'Luigi Bianco'], type: 'individual' },
+        { title: '5 Canzone', participants: ['Giuseppe Montella', 'Giulia Marigliano', 'Lucia De Martino'], type: 'individual' },
+        { title: 'Ballo Sara Fierro', participants: ['Sara Fierro'], type: 'group' },
+        { title: '6 Canzone', participants: ['Ilaria Salvi', 'Sara Baraschini'], type: 'individual' },
+        { title: '7 Canzone', participants: ['Don Giorgio', 'Don Michele', 'Suor Barbara'], type: 'individual' },
+        { title: 'Ballo Sara Fierro', participants: ['Sara Fierro'], type: 'group' },
+        { title: '8 Canzone', participants: ['Emanuele Fierro', 'Vittoria Femia', 'Bruna Baraschini'], type: 'individual' },
+        { title: '9 Canzone', participants: ['Vittoria De Rosa', 'Eliana Duca'], type: 'individual' },
+        { title: '10 Canzone', participants: ['Mayra Sarpa', 'Mattia Sarpa', 'Ilaria Salvi'], type: 'individual' },
+        { title: 'Sketch Mamme', participants: ['Lucia De Martino', 'Anna Martone'], type: 'individual' },
+        { title: 'Ballo Don Michele', participants: ['Don Michele'], type: 'group' },
+        { title: 'Ballo Mary Mola', participants: ['Mary Mola'], type: 'group' },
+        { title: '11 Canzone', participants: ['Aurora Oncia', 'Aurora Gherardi', 'Simona Loffredo'], type: 'individual' },
+        { title: '12 Canzone', participants: ['Vincenzo Duca', 'Mary Mola', 'Lavinia Foria', 'Bianca'], type: 'individual' },
+        { title: '13 Canzone', participants: ['Alessia Ruocco', 'Sara Femia', 'Ambra Girone'], type: 'individual' },
+        { title: 'Ballo Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+        { title: 'Ballo Mamme', participants: ['Mamme'], type: 'group' },
+        { title: 'Sketch', participants: ['Da Definire'], type: 'individual' },
+        { title: '14 Canzone', participants: ['Marta Catello', 'Sophia Calemma'], type: 'individual' },
+        { title: '15 Canzone', participants: ['Melissa Sorrentino', 'Gioia Capuozzo', 'Don Michele'], type: 'individual' },
+        { title: '16 Canzone', participants: ['Giorgia Marigliano', 'Greta D\'Amico', 'Sara Baraschini'], type: 'individual' },
+    ]
+};
 
 export default function AdminPage() {
     const { user, loading: authLoading } = useAuth();
@@ -534,7 +566,7 @@ export default function AdminPage() {
                         <div className="admin-grid" style={{ gridTemplateColumns: '350px 1fr', gap: 24 }}>
                             {/* LISTA SCALETTA */}
                             <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: 10, borderRight: '1px solid var(--border)' }}>
-                                {SCALETTA.map((perf, idx) => (
+                                {SCALETTA[selectedDay]?.map((perf, idx) => (
                                     <div 
                                         key={idx} 
                                         onClick={() => setSelectedPerformance(perf)}

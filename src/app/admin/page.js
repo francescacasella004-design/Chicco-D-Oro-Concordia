@@ -155,13 +155,15 @@ export default function AdminPage() {
             }
             if (pendingRes && pendingRes.ok) { const data = await pendingRes.json(); setPendingScores(data.pendingScores || []); }
             
-            // Fetch daily leaderboards
-            const [lb1Res, lb2Res] = await Promise.all([
+            // Fetch daily leaderboards and final
+            const [lb1Res, lb2Res, lbFinalRes] = await Promise.all([
                 fetch('/api/leaderboard?day=1', { cache: 'no-store' }),
-                fetch('/api/leaderboard?day=2', { cache: 'no-store' })
+                fetch('/api/leaderboard?day=2', { cache: 'no-store' }),
+                fetch('/api/leaderboard', { cache: 'no-store' }) // No day = Final
             ]);
             if (lb1Res.ok) { const data = await lb1Res.json(); setDailyLeaderboard(prev => ({ ...prev, 1: data.leaderboard || [] })); }
             if (lb2Res.ok) { const data = await lb2Res.json(); setDailyLeaderboard(prev => ({ ...prev, 2: data.leaderboard || [] })); }
+            if (lbFinalRes.ok) { const data = await lbFinalRes.json(); setDailyLeaderboard(prev => ({ ...prev, final: data.leaderboard || [] })); }
 
 
         } catch (error) {
@@ -847,26 +849,44 @@ export default function AdminPage() {
                             </h2>
                             <p style={{marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)'}}>Qui puoi vedere come sarebbe la classifica se confermassi i punti ora. Non visibile ai giocatori.</p>
                             
-                            <div className="grid grid-2" style={{ gap: 24 }}>
-                                {[1, 2].map(day => (
-                                    <div key={day} className="card" style={{ background: 'white' }}>
-                                        <h3 style={{ marginBottom: 16, textAlign: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10 }}>
-                                            ☀️ Classifica Giorno {day}
+                            <div className="grid grid-3" style={{ gap: 20 }}>
+                                {[1, 2, 'final'].map(day => (
+                                    <div key={day} className="card" style={{ background: 'white', border: day === 'final' ? '3px solid var(--primary)' : '1px solid var(--border)' }}>
+                                        <h3 style={{ marginBottom: 16, textAlign: 'center', borderBottom: '2px solid var(--border)', paddingBottom: 10, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                            {day === 'final' ? (
+                                                <>
+                                                    <span style={{ fontSize: '1.2rem' }}>🏆 Classifica FINALE</span>
+                                                    <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Somma G1 + G2)</span>
+                                                </>
+                                            ) : (
+                                                `☀️ Classifica Giorno ${day}`
+                                            )}
                                         </h3>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                            {dailyLeaderboard[day] && dailyLeaderboard[day].slice(0, 10).map((team, idx) => (
-                                                <div key={team.teamId} style={{ display: 'flex', flexDirection: 'column', padding: '10px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6, marginBottom: 4 }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '500px', overflowY: 'auto' }}>
+                                            {dailyLeaderboard[day] && dailyLeaderboard[day].map((team, idx) => (
+                                                <div key={team.teamId} style={{ display: 'flex', flexDirection: 'column', padding: '10px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6, marginBottom: 4, border: idx === 0 && day === 'final' ? '1px solid var(--primary)' : 'none' }}>
                                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                         <span>{idx + 1}. <strong>{team.teamName}</strong></span>
                                                         <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{team.totalPoints} pt</span>
                                                     </div>
-                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: 2 }}>
-                                                        👑 Capitano: {team.competitors.find(c => c.isCaptain)?.name || 'Nessuno'}
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: 2 }}>
+                                                        👤 {team.competitors.find(c => c.isCaptain)?.name || 'No Cap'}
                                                     </div>
                                                 </div>
                                             ))}
                                             {(!dailyLeaderboard[day] || dailyLeaderboard[day].length === 0) && <div style={{textAlign: 'center', opacity: 0.5}}>Ancora nessun dato</div>}
                                         </div>
+                                        {day === 'final' && (
+                                            <div style={{ marginTop: 20, paddingTop: 15, borderTop: '2px solid var(--border)' }}>
+                                                <button 
+                                                    className={`btn btn-block ${resultsPublished ? 'btn-secondary' : 'btn-primary'}`}
+                                                    onClick={handlePublishResults}
+                                                    style={{ fontWeight: '900', fontSize: '0.9rem' }}
+                                                >
+                                                    {resultsPublished ? '👁️ Nascondi Risultati' : '🚀 PUBBLICA CLASSIFICA LIVE'}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>

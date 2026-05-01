@@ -43,7 +43,7 @@ const SCALETTA = [
 export default function AdminPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState('scaletta'); // scaletta, assegna, concorrenti, regole, storico, avvisi
+    const [activeTab, setActiveTab] = useState('scaletta'); // scaletta, organizzatori, revisione, concorrenti, regole, storico, avvisi
     const [selectedPerformance, setSelectedPerformance] = useState(null);
 
     // Data State
@@ -453,7 +453,7 @@ export default function AdminPage() {
             </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-                {['scaletta', 'assegna', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
+                {['scaletta', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
                     <button key={tab}
                         className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setActiveTab(tab)}>
@@ -491,13 +491,12 @@ export default function AdminPage() {
                                         fontWeight: isActive ? 'bold' : 'normal'
                                     }}
                                     onClick={() => {
-                                        setScoreListType('capo');
-                                        setActiveTab('assegna');
-                                        const idx = competitors
-                                            .filter(c => c.type === 'capo_animatore')
-                                            .sort((a, b) => a.name.localeCompare(b.name))
-                                            .findIndex(c => c.id === comp.id);
-                                        setCurrentScoreIndex(idx >= 0 ? idx : 0);
+                                        setActiveTab('scaletta');
+                                        setSelectedPerformance({
+                                            title: `🎙️ Presentatore: ${name}`,
+                                            participants: [name],
+                                            type: 'individual'
+                                        });
                                     }}
                                 >
                                     {name}
@@ -510,13 +509,19 @@ export default function AdminPage() {
 
             <div className="card">
                 {activeTab === 'scaletta' && (
-                    <div>
-                        <h2 className="card-title">📋 Scaletta dello Spettacolo</h2>
-                        <p style={{ marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)' }}>Seleziona un\'esibizione per assegnare i punti velocemente.</p>
+                    <div style={{ maxWidth: '100%', width: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="card-title" style={{ margin: 0 }}>📋 Scaletta e Punteggi</h2>
+                            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>📅 Giorno:</span>
+                                <button className={`btn btn-sm ${selectedDay === 1 ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setSelectedDay(1)}>1</button>
+                                <button className={`btn btn-sm ${selectedDay === 2 ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setSelectedDay(2)}>2</button>
+                            </div>
+                        </div>
                         
-                        <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                        <div className="admin-grid" style={{ gridTemplateColumns: '350px 1fr', gap: 24 }}>
                             {/* LISTA SCALETTA */}
-                            <div style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: 10 }}>
+                            <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: 10, borderRight: '1px solid var(--border)' }}>
                                 {SCALETTA.map((perf, idx) => (
                                     <div 
                                         key={idx} 
@@ -615,188 +620,6 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
-                {activeTab === 'assegna' && (
-                    <div style={{ paddingBottom: '30vh' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                            <h2 className="card-title" style={{ margin: 0 }}>✍️ Assegna Punteggio</h2>
-                            <button className="btn btn-secondary" onClick={() => setActiveTab('scaletta')}>
-                                ⬅️ Torna alla Scaletta
-                            </button>
-                        </div>
-
-                        <div className="card" style={{ marginBottom: 24, background: 'rgba(var(--primary-rgb), 0.05)', border: '1px solid var(--border)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 15 }}>
-                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                                        <input
-                                            type="radio"
-                                            checked={scoreListType === 'standard'}
-                                            onChange={() => { setScoreListType('standard'); setCurrentScoreIndex(0); }}
-                                        /> Bambini/Animatori
-                                    </label>
-                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                                        <input
-                                            type="radio"
-                                            checked={scoreListType === 'capo'}
-                                            onChange={() => { setScoreListType('capo'); setCurrentScoreIndex(0); }}
-                                        /> Capi Animatori
-                                    </label>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>📅 Giorno:</span>
-                                    <button 
-                                        className={`btn btn-sm ${selectedDay === 1 ? 'btn-primary' : 'btn-secondary'}`} 
-                                        onClick={() => setSelectedDay(1)}
-                                    >
-                                        1
-                                    </button>
-                                    <button 
-                                        className={`btn btn-sm ${selectedDay === 2 ? 'btn-primary' : 'btn-secondary'}`} 
-                                        onClick={() => setSelectedDay(2)}
-                                    >
-                                        2
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {currentCompetitorToScore ? (
-                            <>
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    background: 'var(--surface)', padding: '24px', borderRadius: '12px', border: '2px solid var(--border)', marginBottom: 24
-                                }}>
-                                    <button
-                                        className="btn btn-secondary"
-                                        disabled={validScoreIndex === 0}
-                                        onClick={() => setCurrentScoreIndex(validScoreIndex - 1)}
-                                    >
-                                        &lt; Prec
-                                    </button>
-
-                                    <div style={{ textAlign: 'center' }}>
-                                        <h3 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--primary)' }}>{currentCompetitorToScore.name}</h3>
-                                        <span className="tag tag-category" style={{ marginTop: 8 }}>{currentCompetitorToScore.type.replace('_', ' ')}</span>
-                                        <div style={{ marginTop: 8, fontSize: '0.85rem', color: 'var(--text-light)' }}>
-                                            {validScoreIndex + 1} di {filteredCompetitorsForScoring.length}
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        className="btn btn-secondary"
-                                        disabled={validScoreIndex === filteredCompetitorsForScoring.length - 1}
-                                        onClick={() => setCurrentScoreIndex(validScoreIndex + 1)}
-                                    >
-                                        Succ &gt;
-                                    </button>
-                                </div>
-                                <div style={{ marginBottom: 20 }}>
-                                    <input 
-                                        type="text" 
-                                        className="form-input" 
-                                        placeholder="🔍 Cerca Bonus o Malus..." 
-                                        value={bmSearch}
-                                        onChange={(e) => setBmSearch(e.target.value)}
-                                        style={{ marginBottom: 16 }}
-                                    />
-                                    
-                                    <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                                        {/* COLONNA BONUS */}
-                                        <div>
-                                            <h4 style={{ color: 'var(--success)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                🟢 Bonus
-                                            </h4>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                                {bonusMalus
-                                                    .filter(bm => bm.points > 0)
-                                                    .filter(bm => bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
-                                                    .sort((a, b) => b.points - a.points)
-                                                    .map(bm => (
-                                                        <button 
-                                                            key={bm.id} 
-                                                            className="btn btn-secondary" 
-                                                            style={{ 
-                                                                justifyContent: 'flex-start', 
-                                                                textAlign: 'left', 
-                                                                padding: '12px',
-                                                                height: 'auto',
-                                                                fontSize: '0.9rem',
-                                                                borderLeft: '6px solid var(--success)',
-                                                                textTransform: 'none'
-                                                            }}
-                                                            onClick={() => handleAssignScore(currentCompetitorToScore.id, bm.id)}
-                                                            disabled={loading}
-                                                        >
-                                                            <span style={{ fontWeight: 800, color: 'var(--success)', minWidth: '40px' }}>+{bm.points}</span>
-                                                            <span style={{ marginLeft: 8 }}>{bm.description}</span>
-                                                        </button>
-                                                    ))}
-                                            </div>
-                                        </div>
-
-                                        {/* COLONNA MALUS */}
-                                        <div>
-                                            <h4 style={{ color: 'var(--danger)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                🔴 Malus
-                                            </h4>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                                {bonusMalus
-                                                    .filter(bm => bm.points < 0)
-                                                    .filter(bm => bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
-                                                    .sort((a, b) => a.points - b.points)
-                                                    .map(bm => (
-                                                        <button 
-                                                            key={bm.id} 
-                                                            className="btn btn-secondary" 
-                                                            style={{ 
-                                                                justifyContent: 'flex-start', 
-                                                                textAlign: 'left', 
-                                                                padding: '12px',
-                                                                height: 'auto',
-                                                                fontSize: '0.9rem',
-                                                                borderLeft: '6px solid var(--danger)',
-                                                                textTransform: 'none'
-                                                            }}
-                                                            onClick={() => handleAssignScore(currentCompetitorToScore.id, bm.id)}
-                                                            disabled={loading}
-                                                        >
-                                                            <span style={{ fontWeight: 800, color: 'var(--danger)', minWidth: '40px' }}>{bm.points}</span>
-                                                            <span style={{ marginLeft: 8 }}>{bm.description}</span>
-                                                        </button>
-                                                    ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* PUNTEGGI APPENA ASSEGNATI */}
-                                {pendingScores.filter(ps => ps.competitorId === currentCompetitorToScore.id).length > 0 && (
-                                    <div style={{ marginTop: 32, padding: 16, background: 'rgba(var(--primary-rgb), 0.05)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                                        <h4 style={{ fontSize: '0.9rem', marginBottom: 10, opacity: 0.8 }}>⚡ Appena assegnati a {currentCompetitorToScore.name}:</h4>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                            {pendingScores
-                                                .filter(ps => ps.competitorId === currentCompetitorToScore.id)
-                                                .map(ps => (
-                                                    <span key={ps.id} className={ps.bonusMalus.points > 0 ? 'tag tag-bonus' : 'tag tag-malus'}>
-                                                        {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); handleDeletePending(ps.id); }}
-                                                            style={{ background: 'none', border: 'none', marginLeft: 6, cursor: 'pointer', color: 'inherit', fontWeight: 'bold' }}
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <div style={{ padding: 40, textAlign: 'center', background: 'var(--surface)', borderRadius: 12 }}>
-                                Nessun concorrente trovato in questa lista.
-                            </div>
-                        )}
-                    </div>
                 )}
 
                 {/* === REVISIONE PUNTEGGI === */}

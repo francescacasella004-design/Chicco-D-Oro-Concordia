@@ -603,39 +603,40 @@ export default function AdminPage() {
                                 ⬅️ Torna alla Scaletta
                             </button>
                         </div>
-                            <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 10 }}>
-                                <label style={{ cursor: 'pointer' }}>
-                                    <input
-                                        type="radio"
-                                        checked={scoreListType === 'standard'}
-                                        onChange={() => { setScoreListType('standard'); setCurrentScoreIndex(0); }}
-                                    /> Bambini/Animatori
-                                </label>
-                                <label style={{ cursor: 'pointer' }}>
-                                    <input
-                                        type="radio"
-                                        checked={scoreListType === 'capo'}
-                                        onChange={() => { setScoreListType('capo'); setCurrentScoreIndex(0); }}
-                                    /> Capi Animatori
-                                </label>
-                            </div>
-                        </h2>
 
-                        <div className="card" style={{ marginBottom: 24, background: 'rgba(var(--primary-rgb), 0.05)', border: '1px solid var(--primary)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-                                <span style={{ fontWeight: 'bold' }}>📅 Seleziona Giorno:</span>
-                                <button 
-                                    className={`btn ${selectedDay === 1 ? 'btn-primary' : 'btn-secondary'}`} 
-                                    onClick={() => setSelectedDay(1)}
-                                >
-                                    Giorno 1
-                                </button>
-                                <button 
-                                    className={`btn ${selectedDay === 2 ? 'btn-primary' : 'btn-secondary'}`} 
-                                    onClick={() => setSelectedDay(2)}
-                                >
-                                    Giorno 2
-                                </button>
+                        <div className="card" style={{ marginBottom: 24, background: 'rgba(var(--primary-rgb), 0.05)', border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 15 }}>
+                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                                        <input
+                                            type="radio"
+                                            checked={scoreListType === 'standard'}
+                                            onChange={() => { setScoreListType('standard'); setCurrentScoreIndex(0); }}
+                                        /> Bambini/Animatori
+                                    </label>
+                                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                                        <input
+                                            type="radio"
+                                            checked={scoreListType === 'capo'}
+                                            onChange={() => { setScoreListType('capo'); setCurrentScoreIndex(0); }}
+                                        /> Capi Animatori
+                                    </label>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>📅 Giorno:</span>
+                                    <button 
+                                        className={`btn btn-sm ${selectedDay === 1 ? 'btn-primary' : 'btn-secondary'}`} 
+                                        onClick={() => setSelectedDay(1)}
+                                    >
+                                        1
+                                    </button>
+                                    <button 
+                                        className={`btn btn-sm ${selectedDay === 2 ? 'btn-primary' : 'btn-secondary'}`} 
+                                        onClick={() => setSelectedDay(2)}
+                                    >
+                                        2
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

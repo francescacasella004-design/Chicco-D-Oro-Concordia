@@ -425,20 +425,33 @@ export default function AdminPage() {
             </div>
 
             {/* === SEZIONE PRESENTATORI SEMPRE VISIBILE === */}
-            <div className="card" style={{ marginBottom: 24, background: 'linear-gradient(135deg, var(--primary), #6366f1)', color: 'white' }}>
+            <div className="card" style={{ marginBottom: 24, background: 'linear-gradient(135deg, var(--primary), #6366f1)', color: 'white', position: 'sticky', top: '10px', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-                    <div>
-                        <h3 style={{ margin: 0 }}>🎙️ Presentatori (Sempre Visibili)</h3>
-                        <p style={{ margin: 0, opacity: 0.9, fontSize: '0.9rem' }}>Vincenzo e Anna possono ricevere punti durante tutto lo spettacolo.</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <button 
+                            className={`btn ${activeTab === 'scaletta' ? 'btn-primary' : ''}`}
+                            style={{ background: activeTab === 'scaletta' ? 'white' : 'rgba(255,255,255,0.2)', color: activeTab === 'scaletta' ? 'var(--primary)' : 'white', border: '1px solid white', fontWeight: 'bold' }}
+                            onClick={() => setActiveTab('scaletta')}
+                        >
+                            📋 SCALETTA
+                        </button>
+                        <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.3)' }}></div>
+                        <h3 style={{ margin: 0, fontSize: '1rem' }}>🎙️ PRESENTATORI:</h3>
                     </div>
                     <div style={{ display: 'flex', gap: 12 }}>
                         {['Vincenzo Duca', 'Anna Martone'].map(name => {
                             const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                            const isActive = activeTab === 'assegna' && currentCompetitorToScore?.id === comp?.id;
                             return comp ? (
                                 <button 
                                     key={comp.id} 
                                     className="btn" 
-                                    style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white' }}
+                                    style={{ 
+                                        background: isActive ? 'white' : 'rgba(255,255,255,0.2)', 
+                                        border: '1px solid white', 
+                                        color: isActive ? 'var(--primary)' : 'white',
+                                        fontWeight: isActive ? 'bold' : 'normal'
+                                    }}
                                     onClick={() => {
                                         setScoreListType('capo');
                                         setActiveTab('assegna');
@@ -584,8 +597,12 @@ export default function AdminPage() {
                 )}
                 {activeTab === 'assegna' && (
                     <div style={{ paddingBottom: '30vh' }}>
-                        <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>✍️ Assegna Punteggio</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="card-title" style={{ margin: 0 }}>✍️ Assegna Punteggio</h2>
+                            <button className="btn btn-secondary" onClick={() => setActiveTab('scaletta')}>
+                                ⬅️ Torna alla Scaletta
+                            </button>
+                        </div>
                             <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', gap: 10 }}>
                                 <label style={{ cursor: 'pointer' }}>
                                     <input

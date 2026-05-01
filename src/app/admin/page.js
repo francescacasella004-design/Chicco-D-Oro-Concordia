@@ -1096,7 +1096,14 @@ export default function AdminPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                         <div><strong>{u.name}</strong> <span style={{ fontSize: '0.8em', opacity: 0.7 }}>({u.role})</span></div>
                                         <div style={{ fontSize: '0.9em' }}>📧 {u.email}</div>
-                                        <div style={{ fontSize: '0.9em' }}>🏆 Squadra: <strong>{u.teamName}</strong></div>
+                                        <div style={{ fontSize: '0.9em' }}>
+                                            🏆 Squadra: <strong>{u.teamName}</strong> 
+                                            {u.teamDetails && u.captainId && (
+                                                <span style={{ marginLeft: 10, color: 'var(--primary)', fontWeight: 'bold' }}>
+                                                    👑 {u.teamDetails.find(c => c.id === u.captainId)?.name || ''}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         <button

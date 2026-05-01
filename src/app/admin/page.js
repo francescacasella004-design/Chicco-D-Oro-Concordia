@@ -140,6 +140,18 @@ export default function AdminPage() {
         setTimeout(() => setMessage(null), 3000);
     };
 
+    // Funzione robusta per trovare un concorrente per nome
+    const findCompetitorByName = (name) => {
+        if (!name) return null;
+        const normalize = (s) => s.toLowerCase().replace(/['’‘`]/g, "'").trim();
+        const searchName = normalize(name);
+        
+        return competitors.find(c => {
+            const dbName = normalize(c.name);
+            return dbName.includes(searchName) || searchName.includes(dbName);
+        });
+    };
+
     const renderBonusMalusList = (isBonus, participants) => {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -162,7 +174,7 @@ export default function AdminPage() {
                             }}
                             onClick={() => {
                                 const ids = participants
-                                    .map(pName => competitors.find(c => c.name.toLowerCase().includes(pName.toLowerCase()))?.id)
+                                    .map(pName => findCompetitorByName(pName)?.id)
                                     .filter(id => id !== undefined);
                                 handleAssignScore(null, bm.id, ids);
                             }}
@@ -589,11 +601,12 @@ export default function AdminPage() {
                                             /* MODALITÀ INDIVIDUALE: UNA LISTA PER OGNI BAMBINO */
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                                                 {selectedPerformance.participants.map(name => {
-                                                    const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                                                    const comp = findCompetitorByName(name);
+                                                    
                                                     return (
                                                         <div key={name} style={{ background: 'var(--surface)', padding: 16, borderRadius: 12, border: '1px solid var(--border)' }}>
                                                             <h4 style={{ marginBottom: 12, color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
-                                                                👤 {name} {!comp && <span style={{ color: 'var(--danger)', fontSize: '0.7rem' }}>⚠️ Non in DB</span>}
+                                                                👤 {name} {!comp && <span style={{ color: 'var(--danger)', fontSize: '0.7rem' }}>⚠️ Non trovato</span>}
                                                             </h4>
                                                             <div className="grid grid-2" style={{ gap: 12 }}>
                                                                 <div>

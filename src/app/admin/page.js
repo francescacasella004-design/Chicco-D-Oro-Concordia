@@ -200,9 +200,11 @@ export default function AdminPage() {
                                 justifyContent: 'flex-start', 
                                 textAlign: 'left', 
                                 height: 'auto', 
-                                padding: '6px 8px',
-                                fontSize: '0.75rem',
-                                borderLeft: `3px solid ${isBonus ? 'var(--success)' : 'var(--danger)'}`
+                                padding: '12px 16px', 
+                                fontSize: '1rem',
+                                borderLeft: `5px solid ${isBonus ? 'var(--success)' : 'var(--danger)'}`,
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                marginBottom: 4
                             }}
                             onClick={() => {
                                 const ids = participants
@@ -211,10 +213,10 @@ export default function AdminPage() {
                                 handleAssignScore(null, bm.id, ids);
                             }}
                         >
-                            <span style={{ fontWeight: 'bold', color: isBonus ? 'var(--success)' : 'var(--danger)', minWidth: '30px' }}>
+                            <span style={{ fontWeight: '900', color: isBonus ? 'var(--success)' : 'var(--danger)', minWidth: '45px', fontSize: '1.2rem' }}>
                                 {isBonus ? '+' : ''}{bm.points}
                             </span>
-                            <span style={{ marginLeft: 4 }}>{bm.description}</span>
+                            <span style={{ marginLeft: 8, fontWeight: '500' }}>{bm.description}</span>
                         </button>
                     ))
                 }
@@ -563,7 +565,7 @@ export default function AdminPage() {
                             </div>
                         </div>
                         
-                        <div className="admin-grid" style={{ gridTemplateColumns: '350px 1fr', gap: 24 }}>
+                        <div className="admin-grid" style={{ gridTemplateColumns: '220px 1fr', gap: 24 }}>
                             {/* LISTA SCALETTA */}
                             <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: 10, borderRight: '1px solid var(--border)' }}>
                                 {SCALETTA[selectedDay]?.map((perf, idx) => (
@@ -571,25 +573,22 @@ export default function AdminPage() {
                                         key={idx} 
                                         onClick={() => setSelectedPerformance(perf)}
                                         style={{ 
-                                            padding: '12px 16px', 
-                                            marginBottom: 8, 
+                                            padding: '10px 12px', 
+                                            marginBottom: 6, 
                                             borderRadius: 8, 
                                             cursor: 'pointer',
                                             border: '1px solid var(--border)',
                                             background: selectedPerformance?.title === perf.title ? 'rgba(var(--primary-rgb), 0.1)' : 'var(--surface)',
                                             borderColor: selectedPerformance?.title === perf.title ? 'var(--primary)' : 'var(--border)',
                                             display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center'
+                                            flexDirection: 'column',
+                                            gap: 4
                                         }}
                                     >
-                                        <div>
-                                            <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>{perf.title}</div>
-                                            <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{perf.participants.join(', ')}</div>
+                                        <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{perf.title}</div>
+                                        <div style={{ fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {perf.participants.join(', ')}
                                         </div>
-                                        <span className={`tag ${perf.type === 'group' ? 'tag-category' : ''}`} style={{ fontSize: '0.7rem' }}>
-                                            {perf.type === 'group' ? 'GRUPPO' : 'INDIVIDUALE'}
-                                        </span>
                                     </div>
                                 ))}
                             </div>

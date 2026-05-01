@@ -3,10 +3,48 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 
+const RAGAZZE_ANIMATRICI = ['Sara Femia', 'Bruna Barashini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia'];
+
+const SCALETTA = [
+    { title: '1 Canzone', participants: ['Giulia Marigliano'], type: 'individual' },
+    { title: '2 Canzone', participants: ['Melissa Sorrentino', 'Gioia Capuozzo'], type: 'individual' },
+    { title: '3 Canzone', participants: ['Ginevra Ragosta', 'Greta D’Amico'], type: 'individual' },
+    { title: '4 Canzone', participants: ['Sara Femia'], type: 'individual' },
+    { title: 'Ballo: Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+    { title: '5 Canzone', participants: ['Roberto Imperatrice'], type: 'individual' },
+    { title: '6 Canzone', participants: ['Simona Loffredo'], type: 'individual' },
+    { title: '7 Canzone', participants: ['Alessia Ruocco'], type: 'individual' },
+    { title: '8 Canzone', participants: ['Bruna Barashini'], type: 'individual' },
+    { title: 'Sketch: Alessia, Gabriele, Luigi', participants: ['Alessia Ruocco', 'Gabriele Piccolo', 'Luigi Bianco'], type: 'individual' },
+    { title: 'Ballo: Gruppo Gaia', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
+    { title: '9 Canzone', participants: ['Conny Barnaba'], type: 'individual' },
+    { title: '10 Canzone', participants: ['Ambra Girone'], type: 'individual' },
+    { title: '11 Canzone', participants: ['Giorgia Ciccone', 'Mattia Sarpa', 'Mayra Sarpa'], type: 'individual' },
+    { title: '12 Canzone', participants: ['Giorgia Marigliano'], type: 'individual' },
+    { title: '13 Canzone', participants: ['Lucia De Martino', 'Anna Martone'], type: 'individual' },
+    { title: 'Ballo Mary Mola', participants: ['Aurora Gherardi', 'Federica Ruocco', 'Marta Catello', 'Melissa Sorrentino', 'Sophia Calemma', 'Benedetta Bracale', 'Greta D’Amico', 'Gioiavittoria', 'Conny Barnaba', 'Aurora Mazza', 'Gioia Capuozzo'], type: 'group' },
+    { title: '14 Canzone', participants: ['Gaia Ciccone'], type: 'individual' },
+    { title: '15 Canzone', participants: ['Luigi Bianco', 'Sasy Ragosta'], type: 'individual' },
+    { title: '16 Canzone', participants: ['Aurora Gherardi'], type: 'individual' },
+    { title: '17 Canzone', participants: ['Maria Mola'], type: 'individual' },
+    { title: 'Sketch Vittoria e Sasy', participants: ['Vittoria De Rosa', 'Sasy Ragosta'], type: 'individual' },
+    { title: 'Ballo: Gruppo Ragazze Animatori', participants: RAGAZZE_ANIMATRICI, type: 'group' },
+    { title: '18 Canzone', participants: ['Bianca Buonadosa', 'Lavinia Foria'], type: 'individual' },
+    { title: '19 Canzone', participants: ['Marta Catello', 'Sophia Calemma'], type: 'individual' },
+    { title: '20 Canzone', participants: ['Benedetta Bracale'], type: 'individual' },
+    { title: '21 Canzone', participants: ['Eliana'], type: 'individual' },
+    { title: 'Ballo Sara Fierro', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
+    { title: '22 Canzone', participants: ['Giuseppe Montella'], type: 'individual' },
+    { title: '23 Canzone', participants: ['Vittoria De Rosa'], type: 'individual' },
+    { title: '24 Canzone', participants: ['Aurora Oncia'], type: 'individual' },
+    { title: '25 Canzone', participants: ['Vittoria Femia'], type: 'individual' },
+];
+
 export default function AdminPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState('assegna'); // assegna, concorrenti, regole, storico, avvisi
+    const [activeTab, setActiveTab] = useState('scaletta'); // scaletta, assegna, concorrenti, regole, storico, avvisi
+    const [selectedPerformance, setSelectedPerformance] = useState(null);
 
     // Data State
     const [competitors, setCompetitors] = useState([]);
@@ -121,25 +159,28 @@ export default function AdminPage() {
         }
     };
 
-    const handleAssignScore = async (competitorId, bonusMalusId) => {
+    const handleAssignScore = async (competitorId, bonusMalusId, multiIds = null) => {
         const bmId = bonusMalusId || selectedBonusMalus;
-        if (!competitorId || !bmId) {
-            showMessage('error', 'Seleziona concorrente e bonus/malus');
+        const ids = multiIds || (competitorId ? [parseInt(competitorId)] : []);
+        
+        if (ids.length === 0 || !bmId) {
+            showMessage('error', 'Seleziona almeno un concorrente e un bonus/malus');
             return;
         }
+        
         setLoading(true);
         try {
             const res = await fetch('/api/scores/pending', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    competitorId: parseInt(competitorId),
+                    competitorIds: ids,
                     bonusMalusId: parseInt(bmId),
                     day: selectedDay
                 }),
             });
             if (res.ok) {
-                showMessage('success', 'Punteggio aggiunto!');
+                showMessage('success', ids.length > 1 ? `Punteggi assegnati al gruppo (${ids.length})!` : 'Punteggio aggiunto!');
                 setSelectedBonusMalus('');
                 fetchData(); // Refresh pending scores
             } else {
@@ -374,16 +415,173 @@ export default function AdminPage() {
             </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-                {['assegna', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
+                {['scaletta', 'assegna', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
                     <button key={tab}
                         className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setActiveTab(tab)}>
-                        {tab === 'organizzatori' ? '👥 Organizzatori' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === 'organizzatori' ? '👥 Organizzatori' : tab === 'scaletta' ? '📋 Scaletta' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
                 ))}
             </div>
 
+            {/* === SEZIONE PRESENTATORI SEMPRE VISIBILE === */}
+            <div className="card" style={{ marginBottom: 24, background: 'linear-gradient(135deg, var(--primary), #6366f1)', color: 'white' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                    <div>
+                        <h3 style={{ margin: 0 }}>🎙️ Presentatori (Sempre Visibili)</h3>
+                        <p style={{ margin: 0, opacity: 0.9, fontSize: '0.9rem' }}>Vincenzo e Anna possono ricevere punti durante tutto lo spettacolo.</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        {['Vincenzo Duca', 'Anna Martone'].map(name => {
+                            const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                            return comp ? (
+                                <button 
+                                    key={comp.id} 
+                                    className="btn" 
+                                    style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white' }}
+                                    onClick={() => {
+                                        setScoreListType('capo');
+                                        setActiveTab('assegna');
+                                        const idx = competitors
+                                            .filter(c => c.type === 'capo_animatore')
+                                            .sort((a, b) => a.name.localeCompare(b.name))
+                                            .findIndex(c => c.id === comp.id);
+                                        setCurrentScoreIndex(idx >= 0 ? idx : 0);
+                                    }}
+                                >
+                                    {name}
+                                </button>
+                            ) : null;
+                        })}
+                    </div>
+                </div>
+            </div>
+
             <div className="card">
+                {activeTab === 'scaletta' && (
+                    <div>
+                        <h2 className="card-title">📋 Scaletta dello Spettacolo</h2>
+                        <p style={{ marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)' }}>Seleziona un\'esibizione per assegnare i punti velocemente.</p>
+                        
+                        <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                            {/* LISTA SCALETTA */}
+                            <div style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: 10 }}>
+                                {SCALETTA.map((perf, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        onClick={() => setSelectedPerformance(perf)}
+                                        style={{ 
+                                            padding: '12px 16px', 
+                                            marginBottom: 8, 
+                                            borderRadius: 8, 
+                                            cursor: 'pointer',
+                                            border: '1px solid var(--border)',
+                                            background: selectedPerformance?.title === perf.title ? 'rgba(var(--primary-rgb), 0.1)' : 'var(--surface)',
+                                            borderColor: selectedPerformance?.title === perf.title ? 'var(--primary)' : 'var(--border)',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <div>
+                                            <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>{perf.title}</div>
+                                            <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{perf.participants.join(', ')}</div>
+                                        </div>
+                                        <span className={`tag ${perf.type === 'group' ? 'tag-category' : ''}`} style={{ fontSize: '0.7rem' }}>
+                                            {perf.type === 'group' ? 'GRUPPO' : 'INDIVIDUALE'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* DETTAGLIO ASSEGNAZIONE */}
+                            <div>
+                                {selectedPerformance ? (
+                                    <div className="card" style={{ border: '2px solid var(--primary)', position: 'sticky', top: 20 }}>
+                                        <h3 style={{ color: 'var(--primary)', marginBottom: 4 }}>{selectedPerformance.title}</h3>
+                                        <p style={{ fontSize: '0.9rem', marginBottom: 20, opacity: 0.8 }}>Partecipanti: {selectedPerformance.participants.join(', ')}</p>
+                                        
+                                        <div style={{ marginBottom: 24 }}>
+                                            <h4 style={{ fontSize: '0.85rem', marginBottom: 10, textTransform: 'uppercase', opacity: 0.6 }}>Assegna a:</h4>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                                {selectedPerformance.type === 'group' ? (
+                                                    <div className="tag tag-category" style={{ padding: '8px 12px' }}>Tutto il Gruppo ({selectedPerformance.participants.length})</div>
+                                                ) : (
+                                                    selectedPerformance.participants.map(name => {
+                                                        const comp = competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                                                        return (
+                                                            <div key={name} className="tag" style={{ padding: '8px 12px', background: comp ? 'var(--surface)' : '#fee2e2', border: '1px solid var(--border)' }}>
+                                                                {name} {!comp && '⚠️ (Non trovato)'}
+                                                            </div>
+                                                        );
+                                                    })
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <input 
+                                            type="text" 
+                                            className="form-input" 
+                                            placeholder="🔍 Cerca Bonus/Malus..." 
+                                            value={bmSearch}
+                                            onChange={(e) => setBmSearch(e.target.value)}
+                                            style={{ marginBottom: 16 }}
+                                        />
+
+                                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                                            <div className="grid grid-2" style={{ gap: 12 }}>
+                                                <div>
+                                                    <h5 style={{ color: 'var(--success)', marginBottom: 8 }}>🟢 Bonus</h5>
+                                                    {bonusMalus.filter(bm => bm.points > 0 && bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
+                                                        .sort((a, b) => b.points - a.points).map(bm => (
+                                                        <button 
+                                                            key={bm.id} 
+                                                            className="btn btn-secondary btn-sm" 
+                                                            style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left', marginBottom: 4, height: 'auto', padding: '8px' }}
+                                                            onClick={() => {
+                                                                const ids = selectedPerformance.participants
+                                                                    .map(name => competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()))?.id)
+                                                                    .filter(id => id !== undefined);
+                                                                handleAssignScore(null, bm.id, ids);
+                                                            }}
+                                                        >
+                                                            <span style={{ fontWeight: 'bold', color: 'var(--success)', minWidth: '35px' }}>+{bm.points}</span>
+                                                            <span style={{ fontSize: '0.8rem', marginLeft: 4 }}>{bm.description}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <div>
+                                                    <h5 style={{ color: 'var(--danger)', marginBottom: 8 }}>🔴 Malus</h5>
+                                                    {bonusMalus.filter(bm => bm.points < 0 && bm.description.toLowerCase().includes(bmSearch.toLowerCase()))
+                                                        .sort((a, b) => a.points - b.points).map(bm => (
+                                                        <button 
+                                                            key={bm.id} 
+                                                            className="btn btn-secondary btn-sm" 
+                                                            style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left', marginBottom: 4, height: 'auto', padding: '8px' }}
+                                                            onClick={() => {
+                                                                const ids = selectedPerformance.participants
+                                                                    .map(name => competitors.find(c => c.name.toLowerCase().includes(name.toLowerCase()))?.id)
+                                                                    .filter(id => id !== undefined);
+                                                                handleAssignScore(null, bm.id, ids);
+                                                            }}
+                                                        >
+                                                            <span style={{ fontWeight: 'bold', color: 'var(--danger)', minWidth: '35px' }}>{bm.points}</span>
+                                                            <span style={{ fontSize: '0.8rem', marginLeft: 4 }}>{bm.description}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)', borderRadius: 12, opacity: 0.5 }}>
+                                        Seleziona un\'esibizione dalla lista a sinistra
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {activeTab === 'assegna' && (
                     <div style={{ paddingBottom: '30vh' }}>
                         <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

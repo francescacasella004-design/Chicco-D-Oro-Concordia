@@ -26,32 +26,37 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
         }
 
-        const { competitorId, bonusMalusId, day } = await request.json();
+        const { competitorId, competitorIds, bonusMalusId, day } = await request.json();
 
-        if (!competitorId || !bonusMalusId) {
+        if ((!competitorId && (!competitorIds || competitorIds.length === 0)) || !bonusMalusId) {
             return NextResponse.json(
-                { error: 'Concorrente e bonus/malus sono obbligatori' },
+                { error: 'Concorrente/i e bonus/malus sono obbligatori' },
                 { status: 400 }
             );
         }
 
-        const pendingScore = await prisma.pendingScoreEvent.create({
-            data: {
-                competitorId,
-                bonusMalusId,
-                assignedById: user.userId,
-                day: day || 1,
-            },
-            include: {
-                competitor: true,
-                bonusMalus: true,
-            },
-        });
+        // If it's a single ID, convert to array for uniform processing
+        const ids = competitorIds || [competitorId];
 
-        return NextResponse.json({ pendingScore }, { status: 201 });
+        const results = await Promise.all(ids.map(id => 
+            prisma.pendingScoreEvent.create({
+                data: {
+                    competitorId: parseInt(id),
+                    bonusMalusId: parseInt(bonusMalusId),
+                    assignedById: user.userId,
+                    day: day || 1,
+                },
+                include: {
+                    competitor: true,
+                    bonusMalus: true,
+                },
+            })
+        ));
+
+        return NextResponse.json({ pendingScores: results }, { status: 201 });
     } catch (error) {
-        console.error('Error creating pending score:', error);
-        return NextResponse.json({ error: 'Errore nell\'assegnazione del punteggio in attesa' }, { status: 500 });
+        console.error('Error creating pending scores:', error);
+        return NextResponse.json({ error: 'Errore nell\'assegnazione dei punteggi' }, { status: 500 });
     }
 }
 

@@ -620,7 +620,6 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
-                )}
 
                 {/* === REVISIONE PUNTEGGI === */}
                 {activeTab === 'revisione' && (

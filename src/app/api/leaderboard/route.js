@@ -14,11 +14,6 @@ export async function GET(request) {
 
         // Get all teams with their competitors and captain
         const teams = await prisma.team.findMany({
-            where: {
-                user: {
-                    role: { not: 'admin' }
-                }
-            },
             include: {
                 user: { select: { name: true, email: true } },
                 competitors: {

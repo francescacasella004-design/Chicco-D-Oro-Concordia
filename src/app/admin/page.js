@@ -856,20 +856,23 @@ export default function AdminPage() {
                                             {day === 'final' ? (
                                                 <>
                                                     <span style={{ fontSize: '1.2rem' }}>🏆 Classifica FINALE</span>
-                                                    <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Somma G1 + G2)</span>
+                                                    <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Totale: {dailyLeaderboard[day]?.length || 0} squadre)</span>
                                                 </>
                                             ) : (
-                                                `☀️ Classifica Giorno ${day}`
+                                                <>
+                                                    <span>☀️ Classifica Giorno {day}</span>
+                                                    <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Totale: {dailyLeaderboard[day]?.length || 0} squadre)</span>
+                                                </>
                                             )}
                                         </h3>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '500px', overflowY: 'auto' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '800px', overflowY: 'auto', paddingRight: 5 }}>
                                             {dailyLeaderboard[day] && dailyLeaderboard[day].map((team, idx) => (
-                                                <div key={team.teamId} style={{ display: 'flex', flexDirection: 'column', padding: '10px 12px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6, marginBottom: 4, border: idx === 0 && day === 'final' ? '1px solid var(--primary)' : 'none' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                        <span>{idx + 1}. <strong>{team.teamName}</strong></span>
-                                                        <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{team.totalPoints} pt</span>
+                                                <div key={team.teamId} style={{ display: 'flex', flexDirection: 'column', padding: '8px 10px', background: idx < 3 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent', borderRadius: 6, marginBottom: 4, border: idx === 0 && day === 'final' ? '1px solid var(--primary)' : 'none' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <span style={{ fontSize: '0.85rem' }}>{idx + 1}. <strong>{team.teamName}</strong></span>
+                                                        <span style={{ fontWeight: 'bold', color: 'var(--primary)', fontSize: '0.9rem' }}>{team.totalPoints} pt</span>
                                                     </div>
-                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: 2 }}>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-light)', marginTop: 2 }}>
                                                         👤 {team.competitors.find(c => c.isCaptain)?.name || 'No Cap'}
                                                     </div>
                                                 </div>

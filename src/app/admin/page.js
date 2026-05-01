@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 
-const RAGAZZE_ANIMATRICI = ['Bruna Barashini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia', 'Paola Fenderico', 'Sara Baraschini', 'Ilaria Salvi'];
+const RAGAZZE_ANIMATRICI = ['Bruna Baraschini', 'Giorgia Marigliano', 'Eliana', 'Vittoria Femia', 'Paola Fenderico', 'Sara Baraschini', 'Ilaria Salvi'];
 
 const SCALETTA = [
     { title: '1 Canzone', participants: ['Giulia Marigliano'], type: 'individual' },
@@ -14,7 +14,7 @@ const SCALETTA = [
     { title: '5 Canzone', participants: ['Roberto Imperatrice'], type: 'individual' },
     { title: '6 Canzone', participants: ['Simona Loffredo'], type: 'individual' },
     { title: '7 Canzone', participants: ['Alessia Ruocco'], type: 'individual' },
-    { title: '8 Canzone', participants: ['Bruna Barashini'], type: 'individual' },
+    { title: '8 Canzone', participants: ['Bruna Baraschini'], type: 'individual' },
     { title: 'Sketch: Alessia, Gabriele, Luigi', participants: ['Alessia Ruocco', 'Gabriele Piccolo', 'Luigi Bianco'], type: 'individual' },
     { title: 'Ballo: Gruppo Gaia', participants: ['Gaia Ciccone', 'Aurora Oncia', 'Lavinia Foria', 'Bianca Buonadosa', 'Giuseppe Montella', 'Ambra Girone', 'Giulia Guariniello'], type: 'group' },
     { title: '9 Canzone', participants: ['Conny Barnaba'], type: 'individual' },

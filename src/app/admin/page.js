@@ -98,8 +98,9 @@ export default function AdminPage() {
     const [registrationOpen, setRegistrationOpen] = useState(true);
     const [resultsPublished, setResultsPublished] = useState(false);
     const [bmSearch, setBmSearch] = useState('');
-    const [selectedDay, setSelectedDay] = useState(1);
+    const [selectedDay, setSelectedDay] = useState(2);
     const [dailyLeaderboard, setDailyLeaderboard] = useState({ 1: [], 2: [] });
+
     const [competitorRanking, setCompetitorRanking] = useState([]);
 
     // Edit/Delete State
@@ -894,6 +895,14 @@ export default function AdminPage() {
                             </div>
                             <div style={{ display: 'flex', gap: 12 }}>
                                 <button className="btn" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid white' }} onClick={() => setActiveTab('scaletta')}>⬅️ Torna Indietro</button>
+                                <button
+                                    className="btn btn-danger"
+                                    style={{ background: '#c0392b', border: 'none' }}
+                                    onClick={() => { if (confirm('VUOI SVUOTARE TUTTA LA REVISIONE? Questa azione non può essere annullata.')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
+                                    disabled={pendingScores.length === 0}
+                                >
+                                    🗑️ Svuota Tutto
+                                </button>
                                 <button 
                                     className="btn" 
                                     style={{ background: 'white', color: '#27ae60', fontWeight: '900', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', border: 'none', padding: '10px 25px' }}

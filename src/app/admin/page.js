@@ -493,6 +493,9 @@ export default function AdminPage() {
     };
 
     const getConsensusScores = () => {
+        const admin2 = users.filter(u => u.role === 'admin')[1]; // Il secondo admin nella lista
+        const admin2Id = admin2 ? admin2.id : null;
+
         const groups = {};
         pendingScores.forEach(ps => {
             const key = `${ps.competitorId}-${ps.bonusMalusId}-${ps.day}`;
@@ -503,7 +506,11 @@ export default function AdminPage() {
         return Object.values(groups)
             .filter(group => {
                 const uniqueAdmins = new Set(group.map(s => s.assignedById));
-                return uniqueAdmins.size >= 2;
+                const isMalus = group[0].bonusMalus.points < 0;
+                const putByAdmin2 = admin2Id && group.some(s => s.assignedById === admin2Id);
+
+                // Regola: Almeno 2 admin OPPURE è un Malus messo dall'Admin 2
+                return uniqueAdmins.size >= 2 || (isMalus && putByAdmin2);
             })
             .map(group => ({
                 ...group[0],

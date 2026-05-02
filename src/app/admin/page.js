@@ -1410,7 +1410,17 @@ export default function AdminPage() {
                             const filteredComp = competitors
                                 .filter(c => c.type === type)
                                 .map(c => {
-                                    const day1Scores = scoreHistory.filter(s => s.competitorId === c.id && s.day === 1);
+                                    const day1ScoresRaw = scoreHistory.filter(s => s.competitorId === c.id && s.day === 1);
+                                    
+                                    // Deduplica per la visualizzazione
+                                    const uniqueScoresMap = new Map();
+                                    day1ScoresRaw.forEach(s => {
+                                        if (!uniqueScoresMap.has(s.bonusMalusId)) {
+                                            uniqueScoresMap.set(s.bonusMalusId, s);
+                                        }
+                                    });
+                                    const day1Scores = Array.from(uniqueScoresMap.values());
+                                    
                                     const total = day1Scores.reduce((sum, s) => sum + s.bonusMalus.points, 0);
                                     return { ...c, day1Scores, total };
                                 })

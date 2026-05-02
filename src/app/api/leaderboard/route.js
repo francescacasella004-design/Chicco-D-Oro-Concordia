@@ -37,7 +37,17 @@ export async function GET(request) {
             let totalPoints = 0;
             const competitorDetails = team.competitors.map((tc) => {
                 const comp = tc.competitor;
-                const compPoints = comp.scores.reduce((sum, s) => sum + s.bonusMalus.points, 0);
+                
+                // Deduplicazione: conta ogni bonus/malus una sola volta per giorno
+                const uniqueScoresMap = new Map();
+                comp.scores.forEach(s => {
+                    const key = `${s.bonusMalusId}-${s.day}`;
+                    if (!uniqueScoresMap.has(key)) {
+                        uniqueScoresMap.set(key, s.bonusMalus.points);
+                    }
+                });
+                const compPoints = Array.from(uniqueScoresMap.values()).reduce((sum, p) => sum + p, 0);
+                
                 const isCaptain = team.captainId === comp.id;
                 const finalPoints = isCaptain ? compPoints * 2 : compPoints;
                 totalPoints += finalPoints;

@@ -11,7 +11,7 @@ export async function GET() {
                 assignedBy: { select: { name: true } },
             },
             orderBy: { createdAt: 'desc' },
-            take: 100,
+
         });
         return NextResponse.json({ scoreEvents });
     } catch (error) {

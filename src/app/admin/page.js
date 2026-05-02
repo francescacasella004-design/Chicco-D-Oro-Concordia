@@ -481,7 +481,27 @@ export default function AdminPage() {
         }
     };
 
+    const handleClearAllPending = async () => {
+        if (!confirm('VUOI SVUOTARE TUTTA LA REVISIONE? Questa azione non può essere annullata.')) return;
+        
+        setLoading(true);
+        try {
+            const res = await fetch('/api/scores/pending/clear', { method: 'POST' });
+            if (res.ok) {
+                showMessage('success', 'Revisione svuotata!');
+                fetchData();
+            } else {
+                showMessage('error', 'Errore nella pulizia');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDeletePending = async (id) => {
+
         if (!confirm('Eliminare questo punteggio in attesa?')) return;
         try {
             const res = await fetch(`/api/scores/pending?id=${id}`, { method: 'DELETE' });
@@ -900,7 +920,7 @@ export default function AdminPage() {
                                 <button
                                     className="btn btn-danger"
                                     style={{ background: '#c0392b', border: 'none' }}
-                                    onClick={() => { if (confirm('VUOI SVUOTARE TUTTA LA REVISIONE? Questa azione non può essere annullata.')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
+                                    onClick={handleClearAllPending}
                                     disabled={pendingScores.length === 0}
                                 >
                                     🗑️ Svuota Tutto

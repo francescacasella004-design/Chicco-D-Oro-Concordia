@@ -492,7 +492,67 @@ export default function AdminPage() {
         }
     };
 
+    const getConsensusScores = () => {
+        const groups = {};
+        pendingScores.forEach(ps => {
+            const key = `${ps.competitorId}-${ps.bonusMalusId}-${ps.day}`;
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(ps);
+        });
+
+        return Object.values(groups)
+            .filter(group => {
+                const uniqueAdmins = new Set(group.map(s => s.assignedById));
+                return uniqueAdmins.size >= 2;
+            })
+            .map(group => ({
+                ...group[0],
+                voters: [...new Set(group.map(s => s.assignedBy.name))],
+                allIds: group.map(s => s.id)
+            }))
+            .sort((a, b) => a.competitor.name.localeCompare(b.competitor.name));
+    };
+
+    const handleConfirmConsensus = async () => {
+        const consensus = getConsensusScores();
+        if (consensus.length === 0) return alert("Nessun punteggio ha raggiunto il consenso (almeno 2 admin).");
+        
+        const allIdsToRemove = consensus.flatMap(c => c.allIds);
+        const representativeIds = consensus.map(c => c.id);
+
+        if (!confirm(`Stai per confermare ${consensus.length} punteggi validati. Verranno rimosse ${allIdsToRemove.length} voci totali dalla revisione. Continuare?`)) return;
+
+        setLoading(true);
+        try {
+            // Confermiamo solo i rappresentanti (per creare 1 ScoreEvent)
+            const res = await fetch('/api/scores/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: representativeIds }),
+            });
+
+            if (res.ok) {
+                // Eliminiamo i restanti duplicati che non sono stati confermati
+                const otherIds = allIdsToRemove.filter(id => !representativeIds.includes(id));
+                if (otherIds.length > 0) {
+                    await Promise.all(otherIds.map(id => 
+                        fetch(`/api/scores/pending?id=${id}`, { method: 'DELETE' })
+                    ));
+                }
+                showMessage('success', 'Consenso confermato e pulizia completata!');
+                fetchData();
+            } else {
+                showMessage('error', 'Errore nella conferma');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore di rete');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (authLoading || (!user || user.role !== 'admin')) return <div className="loading"><div className="spinner"></div></div>;
+
 
     const filteredCompetitorsForScoring = competitors
         .filter(c => scoreListType === 'standard' ? c.type !== 'capo_animatore' : c.type === 'capo_animatore')
@@ -773,39 +833,100 @@ export default function AdminPage() {
                                 <button className="btn btn-sm btn-secondary" onClick={() => setActiveTab('scaletta')}>⬅️ Scaletta</button>
                                 <span>👀 Revisione Punteggi</span>
                             </div>
-                            <div style={{ display: 'flex', gap: 10 }}>
+                            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                                 {lastConfirmedIds.length > 0 && (
                                     <button
                                         className="btn btn-sm"
                                         style={{ background: '#f1c40f', color: '#000', fontWeight: 'bold' }}
                                         onClick={handleUndoConfirmation}
                                     >
-                                        ↩️ Annulla Ultima Conferma
+                                        ↩️ Undo
                                     </button>
                                 )}
                                 <button
                                     className="btn btn-sm btn-danger"
-                                    onClick={() => { if (confirm('Svuotare tutti i punteggi in attesa?')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
+                                    onClick={() => { if (confirm('Svuotare TUTTO?')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
                                     disabled={pendingScores.length === 0}
                                 >
-                                    🗑️ Svuota Tutto
+                                    🗑️ Svuota
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-success"
+                                    style={{ background: 'linear-gradient(to right, #27ae60, #2ecc71)', border: '2px solid white' }}
+                                    onClick={handleConfirmConsensus}
+                                    disabled={getConsensusScores().length === 0}
+                                >
+                                    ✨ CONFERMA SOLO CONSENSUALI ({getConsensusScores().length})
                                 </button>
                                 <button
                                     className="btn btn-sm btn-success"
                                     onClick={() => handleConfirmScores(pendingScores.map(ps => ps.id))}
                                     disabled={pendingScores.length === 0}
                                 >
-                                    ✅ Conferma Tutti ({pendingScores.length})
+                                    ✅ Conferma Tutti
                                 </button>
                                 <button
                                     className={`btn btn-sm ${resultsPublished ? 'btn-secondary' : 'btn-primary'}`}
                                     onClick={handlePublishResults}
                                     style={{fontWeight: 'bold', border: '2px solid white'}}
                                 >
-                                    {resultsPublished ? '👁️‍🗨️ Nascondi Classifica' : '🚀 Invia i Risultati (LIVE)'}
+                                    {resultsPublished ? '👁️‍🗨️ Nascondi Classifica' : '🚀 Invia Risultati'}
                                 </button>
                             </div>
                         </h2>
+
+                        {/* === TABELLA CONSOLIDATA CONSENSUS === */}
+                        <div className="card" style={{ marginBottom: 32, border: '3px solid #f1c40f', background: 'rgba(241, 196, 15, 0.05)' }}>
+                            <h3 style={{ color: '#d4ac0d', marginBottom: 15, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                ✨ RISULTATI CONSOLIDATI (CONSENSUS 2/3)
+                                <span className="tag" style={{ background: '#d4ac0d', color: 'white' }}>{getConsensusScores().length} validati</span>
+                            </h3>
+                            <p style={{ fontSize: '0.85rem', marginBottom: 20, opacity: 0.8 }}>
+                                Questi punteggi sono stati assegnati da almeno 2 admin diversi. Sono quelli "sicuri" da inviare.
+                            </p>
+                            
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                                    <thead style={{ background: 'rgba(0,0,0,0.05)', borderBottom: '2px solid #f1c40f' }}>
+                                        <tr>
+                                            <th style={{ padding: '10px', textAlign: 'left' }}>Concorrente</th>
+                                            <th style={{ padding: '10px', textAlign: 'left' }}>Bonus/Malus</th>
+                                            <th style={{ padding: '10px', textAlign: 'center' }}>Punti</th>
+                                            <th style={{ padding: '10px', textAlign: 'center' }}>Giorno</th>
+                                            <th style={{ padding: '10px', textAlign: 'left' }}>Admin Concordi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {getConsensusScores().map((cs, idx) => (
+                                            <tr key={idx} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{cs.competitor.name}</td>
+                                                <td style={{ padding: '10px' }}>{cs.bonusMalus.description}</td>
+                                                <td style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', color: cs.bonusMalus.points > 0 ? 'var(--success)' : 'var(--danger)' }}>
+                                                    {cs.bonusMalus.points > 0 ? '+' : ''}{cs.bonusMalus.points}
+                                                </td>
+                                                <td style={{ padding: '10px', textAlign: 'center' }}>{cs.day}</td>
+                                                <td style={{ padding: '10px' }}>
+                                                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                                                        {cs.voters.map(v => <span key={v} className="tag" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>{v}</span>)}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {getConsensusScores().length === 0 && (
+                                            <tr>
+                                                <td colSpan="5" style={{ padding: '30px', textAlign: 'center', opacity: 0.5 }}>
+                                                    Nessun punteggio ha ancora raggiunto il consenso di 2 admin.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div style={{ marginBottom: 15, opacity: 0.6, fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                            Dettaglio Singoli Admin:
+                        </div>
 
                         <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
                             {[1, 2, 3].map(i => {

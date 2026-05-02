@@ -17,9 +17,17 @@ export async function GET(request) {
             orderBy: { name: 'asc' },
         });
 
-        // Calculate total points for each competitor
+        // Calculate total points for each competitor (Deduplicated)
         const competitorsWithPoints = competitors.map(c => {
-            const totalPoints = c.scores.reduce((sum, s) => sum + s.bonusMalus.points, 0);
+            const uniqueScoresMap = new Map();
+            c.scores.forEach(s => {
+                const key = `${s.bonusMalusId}-${s.day}`;
+                if (!uniqueScoresMap.has(key)) {
+                    uniqueScoresMap.set(key, s.bonusMalus.points);
+                }
+            });
+            const totalPoints = Array.from(uniqueScoresMap.values()).reduce((sum, p) => sum + p, 0);
+            
             return {
                 ...c,
                 totalPoints

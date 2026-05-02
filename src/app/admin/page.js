@@ -671,11 +671,14 @@ export default function AdminPage() {
             </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-                {['scaletta', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi'].map(tab => (
+                {['scaletta', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi', 'dettaglio_g1'].map(tab => (
                     <button key={tab}
                         className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setActiveTab(tab)}>
-                        {tab === 'organizzatori' ? '👥 Organizzatori' : tab === 'scaletta' ? '📋 Scaletta' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === 'organizzatori' ? '👥 Organizzatori' : 
+                         tab === 'scaletta' ? '📋 Scaletta' : 
+                         tab === 'dettaglio_g1' ? '📊 Dettaglio G1' :
+                         tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
                 ))}
             </div>
@@ -1376,6 +1379,60 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
+
+                {/* === DETTAGLIO G1 === */}
+                {activeTab === 'dettaglio_g1' && (
+                    <div>
+                        <h2 className="card-title">📊 Riepilogo Punteggi Prima Serata (Giorno 1)</h2>
+                        <p style={{ marginBottom: 24, color: 'var(--text-light)' }}>Tutti i bonus e malus assegnati definitivamente nella serata di ieri.</p>
+
+                        {['bambino', 'animatore', 'capo_animatore'].map(type => {
+                            const filteredComp = competitors
+                                .filter(c => c.type === type)
+                                .map(c => {
+                                    const day1Scores = scoreHistory.filter(s => s.competitorId === c.id && s.day === 1);
+                                    const total = day1Scores.reduce((sum, s) => sum + s.bonusMalus.points, 0);
+                                    return { ...c, day1Scores, total };
+                                })
+                                .sort((a, b) => b.total - a.total);
+
+                            if (filteredComp.length === 0) return null;
+
+                            return (
+                                <div key={type} style={{ marginBottom: 40 }}>
+                                    <h3 style={{ textTransform: 'capitalize', borderBottom: '2px solid var(--primary)', paddingBottom: 8, marginBottom: 16, color: 'var(--primary)', display: 'flex', justifyContent: 'space-between' }}>
+                                        <span>{type.replace('_', ' ')}s</span>
+                                        <span style={{fontSize: '0.8rem', opacity: 0.6}}>{filteredComp.length} Concorrenti</span>
+                                    </h3>
+                                    <div className="grid grid-3" style={{ gap: 15 }}>
+                                        {filteredComp.map(c => (
+                                            <div key={c.id} className="card" style={{ padding: 15, background: 'white', border: '1px solid #eee', position: 'relative', overflow: 'hidden' }}>
+                                                {c.total > 0 && <div style={{position: 'absolute', top: -10, right: -10, background: 'var(--success)', width: 40, height: 40, transform: 'rotate(45deg)', opacity: 0.1}}></div>}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, position: 'relative', zIndex: 1 }}>
+                                                    <strong style={{fontSize: '0.95rem'}}>{c.name}</strong>
+                                                    <span className="tag" style={{ background: c.total >= 0 ? 'var(--success)' : 'var(--danger)', color: 'white', fontWeight: '900', fontSize: '0.85rem' }}>
+                                                        {c.total > 0 ? '+' : ''}{c.total}
+                                                    </span>
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                                    {c.day1Scores.length > 0 ? c.day1Scores.map((s, idx) => (
+                                                        <div key={idx} style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', opacity: 0.8, padding: '3px 0', borderBottom: '1px solid #f5f5f5' }}>
+                                                            <span style={{flex: 1, paddingRight: 5}}>• {s.bonusMalus.description}</span>
+                                                            <span style={{ fontWeight: 'bold', color: s.bonusMalus.points > 0 ? 'var(--success)' : 'var(--danger)' }}>
+                                                                {s.bonusMalus.points > 0 ? '+' : ''}{s.bonusMalus.points}
+                                                            </span>
+                                                        </div>
+                                                    )) : <div style={{ fontSize: '0.7rem', opacity: 0.4, fontStyle: 'italic' }}>Nessun punto assegnato</div>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
             </div>
 
             {/* === EDIT MODAL === */}

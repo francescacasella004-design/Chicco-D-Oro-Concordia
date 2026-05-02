@@ -107,6 +107,7 @@ export default function AdminPage() {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [viewingTeam, setViewingTeam] = useState(null); // { userName: string, teamName: string, competitors: [] }
+    const [showAdminDetails, setShowAdminDetails] = useState(false);
 
     // New Item State
     const [newCompetitor, setNewCompetitor] = useState({ name: '', type: 'bambino', cost: 10, imageUrl: '' });
@@ -558,6 +559,57 @@ export default function AdminPage() {
         }
     };
 
+    const handleConfirmAndPublish = async () => {
+        const consensus = getConsensusScores();
+        if (consensus.length === 0 && pendingScores.length > 0) {
+            if (!confirm("Attenzione: Nessun punteggio ha raggiunto il consenso. Se procedi, i punteggi in sospeso rimarranno tali. Continuare?")) return;
+        }
+
+        if (!confirm(`🚀 STAI PER PUBBLICARE I RISULTATI FINALI ONLINE.\n\nOperazioni che verranno eseguite:\n1. Conferma di ${consensus.length} punteggi validati.\n2. Pulizia dei duplicati.\n3. Pubblicazione della classifica ufficiale.\n\nSEI SICURO?`)) return;
+
+        setLoading(true);
+        try {
+            // 1. Conferma i punteggi consensuali
+            if (consensus.length > 0) {
+                const representativeIds = consensus.map(c => c.id);
+                const allIdsToRemove = consensus.flatMap(c => c.allIds);
+
+                const resConfirm = await fetch('/api/scores/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: representativeIds }),
+                });
+
+                if (resConfirm.ok) {
+                    const otherIds = allIdsToRemove.filter(id => !representativeIds.includes(id));
+                    if (otherIds.length > 0) {
+                        await Promise.all(otherIds.map(id => 
+                            fetch(`/api/scores/pending?id=${id}`, { method: 'DELETE' })
+                        ));
+                    }
+                }
+            }
+
+            // 2. Pubblica i risultati
+            const resPublish = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resultsPublished: true })
+            });
+
+            if (resPublish.ok) {
+                setResultsPublished(true);
+                showMessage('success', '🚀 RISULTATI PUBBLICATI ONLINE CON SUCCESSO!');
+                fetchData();
+                setActiveTab('revisione');
+            }
+        } catch (e) {
+            showMessage('error', 'Errore durante la pubblicazione');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (authLoading || (!user || user.role !== 'admin')) return <div className="loading"><div className="spinner"></div></div>;
 
 
@@ -834,95 +886,86 @@ export default function AdminPage() {
 
                 {/* === REVISIONE PUNTEGGI === */}
                 {activeTab === 'revisione' && (
-                    <div>
-                        <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-                                <button className="btn btn-sm btn-secondary" onClick={() => setActiveTab('scaletta')}>⬅️ Scaletta</button>
-                                <span>👀 Revisione Punteggi</span>
+                    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                        <div className="page-header" style={{ background: 'linear-gradient(135deg, #2ecc71, #27ae60)', color: 'white', marginBottom: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 30px' }}>
+                            <div>
+                                <h1 style={{ color: 'white', marginBottom: 5 }}>🏁 Revisione Finale e Invio</h1>
+                                <p style={{ opacity: 0.9 }}>Controlla la tabella unica e pubblica i risultati online</p>
                             </div>
-                            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                                {lastConfirmedIds.length > 0 && (
-                                    <button
-                                        className="btn btn-sm"
-                                        style={{ background: '#f1c40f', color: '#000', fontWeight: 'bold' }}
-                                        onClick={handleUndoConfirmation}
-                                    >
-                                        ↩️ Undo
-                                    </button>
-                                )}
-                                <button
-                                    className="btn btn-sm btn-danger"
-                                    onClick={() => { if (confirm('Svuotare TUTTO?')) pendingScores.forEach(ps => handleDeletePending(ps.id)) }}
-                                    disabled={pendingScores.length === 0}
+                            <div style={{ display: 'flex', gap: 12 }}>
+                                <button className="btn" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid white' }} onClick={() => setActiveTab('scaletta')}>⬅️ Torna Indietro</button>
+                                <button 
+                                    className="btn" 
+                                    style={{ background: 'white', color: '#27ae60', fontWeight: '900', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', border: 'none', padding: '10px 25px' }}
+                                    onClick={handleConfirmAndPublish}
+                                    disabled={loading}
                                 >
-                                    🗑️ Svuota
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-success"
-                                    style={{ background: 'linear-gradient(to right, #27ae60, #2ecc71)', border: '2px solid white' }}
-                                    onClick={handleConfirmConsensus}
-                                    disabled={getConsensusScores().length === 0}
-                                >
-                                    ✨ CONFERMA SOLO CONSENSUALI ({getConsensusScores().length})
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-success"
-                                    onClick={() => handleConfirmScores(pendingScores.map(ps => ps.id))}
-                                    disabled={pendingScores.length === 0}
-                                >
-                                    ✅ Conferma Tutti
-                                </button>
-                                <button
-                                    className={`btn btn-sm ${resultsPublished ? 'btn-secondary' : 'btn-primary'}`}
-                                    onClick={handlePublishResults}
-                                    style={{fontWeight: 'bold', border: '2px solid white'}}
-                                >
-                                    {resultsPublished ? '👁️‍🗨️ Nascondi Classifica' : '🚀 Invia Risultati'}
+                                    🚀 PUBBLICA RISULTATI ONLINE
                                 </button>
                             </div>
-                        </h2>
+                        </div>
 
-                        {/* === TABELLA CONSOLIDATA CONSENSUS === */}
-                        <div className="card" style={{ marginBottom: 32, border: '3px solid #f1c40f', background: 'rgba(241, 196, 15, 0.05)' }}>
-                            <h3 style={{ color: '#d4ac0d', marginBottom: 15, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                ✨ RISULTATI CONSOLIDATI (CONSENSUS 2/3)
-                                <span className="tag" style={{ background: '#d4ac0d', color: 'white' }}>{getConsensusScores().length} validati</span>
-                            </h3>
-                            <p style={{ fontSize: '0.85rem', marginBottom: 20, opacity: 0.8 }}>
-                                Questi punteggi sono stati assegnati da almeno 2 admin diversi. Sono quelli "sicuri" da inviare.
-                            </p>
+                        {message && (
+                            <div className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'}`} style={{ marginBottom: 24 }}>
+                                {message.text}
+                            </div>
+                        )}
+
+                        <div className="card" style={{ padding: 0, overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: '2px solid #27ae60' }}>
+                            <div style={{ padding: '20px 25px', background: '#f8f9fa', borderBottom: '2px solid #27ae60', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h2 style={{ margin: 0, color: '#27ae60', fontSize: '1.3rem', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    ✨ TABELLA UNICA PUNTEGGI VALIDATI
+                                    <span className="tag" style={{ background: '#27ae60', color: 'white' }}>{getConsensusScores().length} Punti Totali</span>
+                                </h2>
+                                <div style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
+                                    Regola: consenso 2/3 + Malus Admin 2
+                                </div>
+                            </div>
                             
                             <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                                    <thead style={{ background: 'rgba(0,0,0,0.05)', borderBottom: '2px solid #f1c40f' }}>
-                                        <tr>
-                                            <th style={{ padding: '10px', textAlign: 'left' }}>Concorrente</th>
-                                            <th style={{ padding: '10px', textAlign: 'left' }}>Bonus/Malus</th>
-                                            <th style={{ padding: '10px', textAlign: 'center' }}>Punti</th>
-                                            <th style={{ padding: '10px', textAlign: 'center' }}>Giorno</th>
-                                            <th style={{ padding: '10px', textAlign: 'left' }}>Admin Concordi</th>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead>
+                                        <tr style={{ background: '#f1f3f5', textAlign: 'left' }}>
+                                            <th style={{ padding: '15px 25px', color: '#495057' }}>Concorrente</th>
+                                            <th style={{ padding: '15px 25px', color: '#495057' }}>Bonus / Malus</th>
+                                            <th style={{ padding: '15px 25px', color: '#495057', textAlign: 'center' }}>Valore</th>
+                                            <th style={{ padding: '15px 25px', color: '#495057', textAlign: 'center' }}>Giorno</th>
+                                            <th style={{ padding: '15px 25px', color: '#495057' }}>Assegnato da</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {getConsensusScores().map((cs, idx) => (
-                                            <tr key={idx} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{cs.competitor.name}</td>
-                                                <td style={{ padding: '10px' }}>{cs.bonusMalus.description}</td>
-                                                <td style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', color: cs.bonusMalus.points > 0 ? 'var(--success)' : 'var(--danger)' }}>
-                                                    {cs.bonusMalus.points > 0 ? '+' : ''}{cs.bonusMalus.points}
+                                            <tr key={idx} style={{ borderBottom: '1px solid #e9ecef', background: idx % 2 === 0 ? 'white' : '#fafbfc' }}>
+                                                <td style={{ padding: '15px 25px', fontWeight: 'bold', color: 'var(--primary)' }}>{cs.competitor.name}</td>
+                                                <td style={{ padding: '15px 25px' }}>{cs.bonusMalus.description}</td>
+                                                <td style={{ padding: '15px 25px', textAlign: 'center' }}>
+                                                    <span style={{ 
+                                                        fontWeight: '900', 
+                                                        fontSize: '1.1rem',
+                                                        color: cs.bonusMalus.points > 0 ? '#27ae60' : '#e74c3c',
+                                                        background: cs.bonusMalus.points > 0 ? '#e8f5e9' : '#fdedec',
+                                                        padding: '4px 10px',
+                                                        borderRadius: '6px'
+                                                    }}>
+                                                        {cs.bonusMalus.points > 0 ? '+' : ''}{cs.bonusMalus.points}
+                                                    </span>
                                                 </td>
-                                                <td style={{ padding: '10px', textAlign: 'center' }}>{cs.day}</td>
-                                                <td style={{ padding: '10px' }}>
-                                                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                                                        {cs.voters.map(v => <span key={v} className="tag" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>{v}</span>)}
+                                                <td style={{ padding: '15px 25px', textAlign: 'center' }}>
+                                                    <span className="tag" style={{ background: '#dee2e6', color: '#495057' }}>Giorno {cs.day}</span>
+                                                </td>
+                                                <td style={{ padding: '15px 25px' }}>
+                                                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                                                        {cs.voters.map(v => (
+                                                            <span key={v} style={{ fontSize: '0.7rem', background: '#e9ecef', padding: '2px 8px', borderRadius: '4px', color: '#495057' }}>{v}</span>
+                                                        ))}
                                                     </div>
                                                 </td>
                                             </tr>
                                         ))}
                                         {getConsensusScores().length === 0 && (
                                             <tr>
-                                                <td colSpan="5" style={{ padding: '30px', textAlign: 'center', opacity: 0.5 }}>
-                                                    Nessun punteggio ha ancora raggiunto il consenso di 2 admin.
+                                                <td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#adb5bd', fontSize: '1.1rem' }}>
+                                                    📭 Nessun punteggio validato trovato. Assicurati che almeno 2 admin abbiano segnato lo stesso punto.
                                                 </td>
                                             </tr>
                                         )}
@@ -931,45 +974,58 @@ export default function AdminPage() {
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: 15, opacity: 0.6, fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                            Dettaglio Singoli Admin:
+                        <div style={{ marginTop: 40, textAlign: 'center' }}>
+                            <button 
+                                className="btn btn-sm btn-secondary" 
+                                onClick={() => setShowAdminDetails(!showAdminDetails)}
+                                style={{ background: 'transparent', color: '#666', border: '1px solid #ddd' }}
+                            >
+                                {showAdminDetails ? '🔼 Nascondi Dettaglio Admin' : '🔽 Mostra Dettaglio Singoli Admin'}
+                            </button>
                         </div>
 
-                        <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-                            {[1, 2, 3].map(i => {
-                                const admin = users.filter(u => u.role === 'admin')[i-1];
-                                if (!admin && i > 1) return <div key={i} className="card" style={{opacity: 0.5, border: '1px dashed var(--border)', textAlign: 'center', padding: 40}}>Slot Admin {i} Libero</div>;
-                                
-                                const adminId = admin ? admin.id : -1;
-                                const adminName = admin ? admin.name : `Admin ${i}`;
-                                const adminScores = pendingScores.filter(ps => ps.assignedBy.id === adminId);
+                        {showAdminDetails && (
+                            <div style={{ marginTop: 30 }}>
+                                <div style={{ marginBottom: 15, opacity: 0.6, fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center' }}>
+                                    Punteggi Inseriti dai singoli Admin (Dettaglio):
+                                </div>
+                                <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+                                    {[1, 2, 3].map(i => {
+                                        const admin = users.filter(u => u.role === 'admin')[i-1];
+                                        if (!admin && i > 1) return <div key={i} className="card" style={{opacity: 0.5, border: '1px dashed var(--border)', textAlign: 'center', padding: 40}}>Slot Admin {i} Libero</div>;
+                                        
+                                        const adminId = admin ? admin.id : -1;
+                                        const adminName = admin ? admin.name : `Admin ${i}`;
+                                        const adminScores = pendingScores.filter(ps => ps.assignedBy.id === adminId);
 
-                                return (
-                                    <div key={i} className="card" style={{ background: 'var(--background)', border: '2px solid var(--primary)' }}>
-                                        <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 15, display: 'flex', justifyContent: 'space-between', color: 'var(--primary)' }}>
-                                            <span>👤 {adminName}</span>
-                                            <span className="tag" style={{background: 'var(--primary)', color: 'white'}}>{adminScores.length}</span>
-                                        </h3>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '400px', overflowY: 'auto' }}>
-                                            {adminScores.length > 0 ? adminScores.map(ps => (
-                                                <div key={ps.id} className="score-history-item" style={{ padding: '8px 12px', fontSize: '0.85rem', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                                                        <strong>{ps.competitor.name}</strong>
-                                                        <span className="tag" style={{fontSize: '0.7rem'}}>G{ps.day}</span>
-                                                    </div>
-                                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
-                                                            {ps.bonusMalus.description} ({ps.bonusMalus.points > 0 ? '+' : ''}{ps.bonusMalus.points})
+                                        return (
+                                            <div key={i} className="card" style={{ background: 'var(--background)', border: '1px solid var(--border)' }}>
+                                                <h3 style={{ fontSize: '0.9rem', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 15, display: 'flex', justifyContent: 'space-between', color: '#444' }}>
+                                                    <span>👤 {adminName}</span>
+                                                    <span className="tag" style={{background: '#666', color: 'white'}}>{adminScores.length}</span>
+                                                </h3>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '300px', overflowY: 'auto' }}>
+                                                    {adminScores.length > 0 ? adminScores.map(ps => (
+                                                        <div key={ps.id} className="score-history-item" style={{ padding: '8px 12px', fontSize: '0.75rem', flexDirection: 'column', alignItems: 'flex-start', background: '#f8f9fa' }}>
+                                                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                                                                <strong>{ps.competitor.name}</strong>
+                                                                <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>G{ps.day}</span>
+                                                            </div>
+                                                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                                                                <div style={{ fontSize: '0.7rem', color: '#666' }}>
+                                                                    {ps.bonusMalus.description} ({ps.bonusMalus.points})
+                                                                </div>
+                                                                <button className="btn btn-sm btn-danger" style={{padding: '2px 4px', fontSize: '0.6rem'}} onClick={() => handleDeletePending(ps.id)}>🗑️</button>
+                                                            </div>
                                                         </div>
-                                                        <button className="btn btn-sm btn-danger" style={{padding: '2px 6px'}} onClick={() => handleDeletePending(ps.id)}>🗑️</button>
-                                                    </div>
+                                                    )) : <div style={{textAlign: 'center', padding: 20, opacity: 0.5, fontSize: '0.8rem'}}>Vuoto</div>}
                                                 </div>
-                                            )) : <div style={{textAlign: 'center', padding: 20, opacity: 0.5}}>Nessun punto inserito</div>}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         <div style={{ marginTop: 48 }}>
                             <h2 className="card-title" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 10 }}>

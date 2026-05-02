@@ -109,6 +109,8 @@ export default function AdminPage() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [viewingTeam, setViewingTeam] = useState(null); // { userName: string, teamName: string, competitors: [] }
     const [showAdminDetails, setShowAdminDetails] = useState(false);
+    const [userSearch, setUserSearch] = useState('');
+
 
     // New Item State
     const [newCompetitor, setNewCompetitor] = useState({ name: '', type: 'bambino', cost: 10, imageUrl: '' });
@@ -1237,16 +1239,26 @@ export default function AdminPage() {
                 {/* === ORGANIZZATORI (ex UTENTI) === */}
                 {activeTab === 'organizzatori' && (
                     <div>
-                        <h2 className="card-title">👥 Gestione Organizzatori</h2>
-                        
+                        <h2 className="card-title">👥 Gestione Organizzatori e Squadre</h2>
+
                         <div className="card" style={{ marginBottom: 24, border: '2px solid var(--primary)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
-                            <h3 style={{ fontSize: '1.2rem', marginBottom: 15, color: 'var(--primary)' }}>➕ Aggiungi Nuovo Organizzatore</h3>
-                            <p style={{fontSize: '0.9rem', marginBottom: 15}}>Crea un account che potrà assegnare punti e gestire il sito.</p>
-                            <div className="admin-grid">
-                                <input id="newAdminName" className="form-input" placeholder="Nome (es. Admin 2)" />
-                                <input id="newAdminEmail" className="form-input" placeholder="Email (es. admin2@fantachicco.it)" />
-                                <input id="newAdminPassword" type="password" className="form-input" placeholder="Password" />
-                                <button className="btn btn-primary" style={{fontWeight: 'bold'}} onClick={async () => {
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: 15, color: 'var(--primary)' }}>🔍 Cerca Giocatore o Squadra</h3>
+                            <input
+                                className="form-input"
+                                placeholder="Cerca per nome, email o nome squadra..."
+                                value={userSearch}
+                                onChange={e => setUserSearch(e.target.value)}
+                                style={{ width: '100%', fontSize: '1.1rem', padding: '12px 20px', borderRadius: 8, border: '2px solid var(--primary)' }}
+                            />
+                        </div>
+                        
+                        <div className="card" style={{ marginBottom: 24, padding: '15px 20px', background: '#f8f9fa' }}>
+                            <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>➕ Aggiungi Nuovo Organizzatore</h3>
+                            <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr auto', gap: 10 }}>
+                                <input id="newAdminName" className="form-input" style={{padding: '8px'}} placeholder="Nome" />
+                                <input id="newAdminEmail" className="form-input" style={{padding: '8px'}} placeholder="Email" />
+                                <input id="newAdminPassword" type="password" className="form-input" style={{padding: '8px'}} placeholder="Password" />
+                                <button className="btn btn-primary" onClick={async () => {
                                     const name = document.getElementById('newAdminName').value;
                                     const email = document.getElementById('newAdminEmail').value;
                                     const password = document.getElementById('newAdminPassword').value;
@@ -1261,7 +1273,6 @@ export default function AdminPage() {
                                         });
                                         const data = await res.json();
                                         if(res.ok) {
-                                            // Ora promuovilo ad admin
                                             const roleRes = await fetch('/api/users', {
                                                 method: 'PATCH',
                                                 headers: { 'Content-Type': 'application/json' },
@@ -1269,37 +1280,42 @@ export default function AdminPage() {
                                             });
                                             if(roleRes.ok) {
                                                 alert('Organizzatore creato con successo!');
-                                                // Svuota i campi
                                                 document.getElementById('newAdminName').value = '';
                                                 document.getElementById('newAdminEmail').value = '';
                                                 document.getElementById('newAdminPassword').value = '';
                                                 fetchData();
-                                            } else {
-                                                alert('Account creato ma errore nella promozione a organizzatore.');
                                             }
-                                        } else {
-                                            alert('Errore: ' + data.error);
                                         }
-                                    } catch(e) { alert('Errore di rete'); }
-                                    finally { setLoading(false); }
-                                }}>Crea Organizzatore</button>
+                                    } catch(e) {} finally { setLoading(false); }
+                                }}>Crea</button>
                             </div>
                         </div>
 
-                        <div style={{ maxHeight: 500, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
-                            {users.map(u => (
-                                <div key={u.id} className="score-history-item">
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                        <div><strong>{u.name}</strong> <span style={{ fontSize: '0.8em', opacity: 0.7 }}>({u.role})</span></div>
-                                        <div style={{ fontSize: '0.9em' }}>📧 {u.email}</div>
-                                        <div style={{ fontSize: '0.9em' }}>
-                                            🏆 Squadra: <strong>{u.teamName}</strong> 
-                                            {u.teamDetails && u.captainId && (
-                                                <span style={{ marginLeft: 10, color: 'var(--primary)', fontWeight: 'bold' }}>
-                                                    👑 {u.teamDetails.find(c => c.id === u.captainId)?.name || ''}
-                                                </span>
-                                            )}
+                        <div style={{ maxHeight: 600, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
+                            {users.filter(u => 
+                                u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
+                                u.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+                                (u.teamName && u.teamName.toLowerCase().includes(userSearch.toLowerCase()))
+                            ).map(u => (
+                                <div key={u.id} className="score-history-item" style={{ borderLeft: u.role === 'admin' ? '5px solid var(--primary)' : 'none' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <strong>{u.name}</strong>
+                                            <span className="tag" style={{ fontSize: '0.65rem', background: u.role === 'admin' ? 'var(--primary)' : '#eee', color: u.role === 'admin' ? 'white' : 'inherit' }}>{u.role}</span>
                                         </div>
+                                        <div style={{ fontSize: '0.85rem', color: '#666' }}>📧 {u.email}</div>
+                                        {u.teamName ? (
+                                            <div style={{ fontSize: '0.9rem', marginTop: 5, padding: '5px 10px', background: 'rgba(var(--primary-rgb), 0.05)', borderRadius: 4, display: 'inline-block', width: 'fit-content' }}>
+                                                🏆 Squadra: <strong>{u.teamName}</strong> 
+                                                {u.teamDetails && u.captainId && (
+                                                    <span style={{ marginLeft: 10, color: 'var(--primary)', fontWeight: 'bold' }}>
+                                                        👑 {u.teamDetails.find(c => c.id === u.captainId)?.name || ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div style={{ fontSize: '0.8rem', color: '#999', fontStyle: 'italic' }}>Nessuna squadra creata</div>
+                                        )}
                                     </div>
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         <button
@@ -1307,15 +1323,15 @@ export default function AdminPage() {
                                             onClick={() => setViewingTeam({ userName: u.name, teamName: u.teamName, competitors: u.teamDetails || [], captainId: u.captainId })}
                                             title="Vedi Squadra"
                                         >
-                                            👁️ Vedi Squadra
+                                            👁️
                                         </button>
                                         {u.id !== user.userId && (
                                             <button
                                                 className={`btn btn-sm ${u.role === 'admin' ? 'btn-danger' : 'btn-success'}`}
                                                 onClick={() => handleToggleRole(u.id, u.role)}
-                                                title={u.role === 'admin' ? "Rendi Giocatore" : "Rendi Organizzatore"}
+                                                style={{ fontSize: '0.7rem', padding: '4px 8px' }}
                                             >
-                                                {u.role === 'admin' ? '👤 Rendi Giocatore' : '👑 Rendi Organizzatore'}
+                                                {u.role === 'admin' ? '👤 Player' : '👑 Admin'}
                                             </button>
                                         )}
                                         <button
@@ -1329,6 +1345,13 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                             ))}
+                            {users.length > 0 && users.filter(u => 
+                                u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
+                                u.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+                                (u.teamName && u.teamName.toLowerCase().includes(userSearch.toLowerCase()))
+                            ).length === 0 && (
+                                <div style={{ padding: 40, textAlign: 'center', opacity: 0.5 }}>Nessun risultato per "{userSearch}"</div>
+                            )}
                             {users.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>Nessun utente registrato</div>}
                         </div>
                     </div>

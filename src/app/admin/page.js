@@ -1208,7 +1208,27 @@ export default function AdminPage() {
                 {/* === STORICO === */}
                 {activeTab === 'storico' && (
                     <div>
-                        <h2 className="card-title">📜 Storico Punteggi</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="card-title" style={{ margin: 0 }}>📜 Storico Punteggi Confermati</h2>
+                            <button 
+                                className="btn btn-sm btn-secondary" 
+                                style={{ background: 'var(--accent)', color: 'white', border: 'none' }}
+                                onClick={async () => {
+                                    if(!confirm('Vuoi rimuovere tutti i punteggi duplicati (stesso bonus allo stesso bambino)?')) return;
+                                    setLoading(true);
+                                    try {
+                                        const res = await fetch('/api/scores/deduplicate', { method: 'POST' });
+                                        if(res.ok) {
+                                            alert('Deduplicazione completata con successo!');
+                                            fetchData();
+                                        } else { alert('Errore durante la deduplicazione'); }
+                                    } catch(e) { alert('Errore di rete'); }
+                                    finally { setLoading(false); }
+                                }}
+                            >
+                                🧹 Deduplica Punteggi (Rimuovi Doppi)
+                            </button>
+                        </div>
                         <div style={{ maxHeight: 500, overflowY: 'auto', border: '2px solid var(--border)', borderRadius: 8 }}>
                             {scoreHistory.map(event => (
                                 <div key={event.id} className="score-history-item">

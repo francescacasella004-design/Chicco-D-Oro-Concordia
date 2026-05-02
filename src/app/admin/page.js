@@ -23,7 +23,7 @@ const SCALETTA = {
         { title: '11 Canzone', participants: ['Giorgia Ciccone', 'Mattia Sarpa', 'Mayra Sarpa'], type: 'individual' },
         { title: '12 Canzone', participants: ['Giorgia Marigliano'], type: 'individual' },
         { title: '13 Canzone', participants: ['Lucia De Martino', 'Anna Martone'], type: 'individual' },
-        { title: 'Ballo Mary Mola', participants: ['Aurora Gherardi', 'Federica Ruocco', 'Marta Catello', 'Melissa Sorrentino', 'Sophia Calemma', 'Benedetta Bracale', 'Greta D’Amico', 'Gioiavittoria', 'Conny Barnaba', 'Aurora Mazza', 'Gioia Capuozzo'], type: 'group' },
+        { title: 'Ballo Mary Mola', participants: ['Aurora Gherardi', 'Federica Ruocco', 'Marta Catello', 'Melissa Sorrentino', 'Sophia Calemma', 'Benedetta Bracale', 'Greta D’Amico', 'Gioiavittoria', 'Conny Barnaba', 'Aurora Mazza', 'Gioia Capuozzo', 'Ginevra Ragosta'], type: 'group' },
         { title: '14 Canzone', participants: ['Gaia Ciccone'], type: 'individual' },
         { title: '15 Canzone', participants: ['Luigi Bianco', 'Sasy Ragosta'], type: 'individual' },
         { title: '16 Canzone', participants: ['Aurora Gherardi'], type: 'individual' },

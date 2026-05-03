@@ -116,6 +116,7 @@ export default function AdminPage() {
     const [newCompetitor, setNewCompetitor] = useState({ name: '', type: 'bambino', cost: 10, imageUrl: '' });
     const [newBonusMalus, setNewBonusMalus] = useState({ description: '', points: 0, category: 'base' });
     const [newAnnouncement, setNewAnnouncement] = useState({ title: '', content: '', pinned: false });
+    const [socialSearch, setSocialSearch] = useState('');
 
     useEffect(() => {
         if (user?.role === 'admin') {
@@ -1502,6 +1503,17 @@ export default function AdminPage() {
                         <p style={{ marginBottom: 20, color: 'var(--text-light)' }}>
                             Assegna punti extra alle squadre per i follow sui social. I punti verranno aggiunti al totale finale senza essere raddoppiati dal capitano.
                         </p>
+
+                        <div style={{ marginBottom: 20 }}>
+                            <input 
+                                type="text" 
+                                className="form-input" 
+                                placeholder="🔍 Cerca Squadra o Giocatore..." 
+                                value={socialSearch}
+                                onChange={(e) => setSocialSearch(e.target.value)}
+                                style={{ maxWidth: 400 }}
+                            />
+                        </div>
                         
                         <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -1514,10 +1526,17 @@ export default function AdminPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users.filter(u => u.teamName).sort((a,b) => a.teamName.localeCompare(b.teamName)).map(u => (
-                                        <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                            <td style={{ padding: '12px 20px', fontWeight: 'bold', color: 'var(--primary)' }}>{u.teamName}</td>
-                                            <td style={{ padding: '12px 20px', fontSize: '0.9rem' }}>{u.name}</td>
+                                    {users
+                                        .filter(u => u.teamName)
+                                        .filter(u => 
+                                            u.teamName.toLowerCase().includes(socialSearch.toLowerCase()) || 
+                                            u.name.toLowerCase().includes(socialSearch.toLowerCase())
+                                        )
+                                        .sort((a,b) => a.teamName.localeCompare(b.teamName))
+                                        .map(u => (
+                                            <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                                <td style={{ padding: '12px 20px', fontWeight: 'bold', color: 'var(--primary)' }}>{u.teamName}</td>
+                                                <td style={{ padding: '12px 20px', fontSize: '0.9rem' }}>{u.name}</td>
                                             <td style={{ padding: '12px 20px', textAlign: 'center' }}>
                                                 <input 
                                                     type="number" 

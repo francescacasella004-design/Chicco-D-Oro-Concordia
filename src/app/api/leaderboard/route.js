@@ -43,14 +43,25 @@ export async function GET(request) {
                 comp.scores.forEach(s => {
                     const key = `${s.bonusMalusId}-${s.day}`;
                     if (!uniqueScoresMap.has(key)) {
-                        uniqueScoresMap.set(key, s.bonusMalus.points);
+                        uniqueScoresMap.set(key, { 
+                            points: s.bonusMalus.points, 
+                            isSocial: s.bonusMalus.description.startsWith('SOCIAL:') 
+                        });
                     }
                 });
-                const compPoints = Array.from(uniqueScoresMap.values()).reduce((sum, p) => sum + p, 0);
+                
+                let compPointsNormal = 0;
+                let compPointsSocial = 0;
+                Array.from(uniqueScoresMap.values()).forEach(v => {
+                    if (v.isSocial) compPointsSocial += v.points;
+                    else compPointsNormal += v.points;
+                });
                 
                 const isCaptain = team.captainId === comp.id;
-                const finalPoints = isCaptain ? compPoints * 2 : compPoints;
+                // I punti Social NON vengono raddoppiati dal capitano
+                const finalPoints = (isCaptain ? compPointsNormal * 2 : compPointsNormal) + compPointsSocial;
                 totalPoints += finalPoints;
+                const compPoints = compPointsNormal + compPointsSocial;
 
                 return {
                     id: comp.id,

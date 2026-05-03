@@ -643,6 +643,57 @@ export default function AdminPage() {
             setLoading(false);
         }
     };
+    
+    const handleAssignSocialBonus = async (userObj, points) => {
+        if (!userObj.captainId) return alert("Questa squadra non ha un capitano assegnato!");
+        
+        setLoading(true);
+        try {
+            // 1. Crea il Bonus/Malus specifico
+            const bmRes = await fetch('/api/bonus-malus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: `SOCIAL: ${userObj.teamName}`,
+                    points: points,
+                    category: 'social'
+                })
+            });
+            
+            if (!bmRes.ok) throw new Error("Errore creazione bonus");
+            const bmData = await bmRes.json();
+            
+            // 2. Assegna il punto (tramite pending e poi conferma automatica)
+            const scoreRes = await fetch('/api/scores/pending', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    competitorId: userObj.captainId,
+                    bonusMalusId: bmData.bonusMalus.id,
+                    day: 2
+                })
+            });
+            
+            if (scoreRes.ok) {
+                const scoreData = await scoreRes.json();
+                const pendingId = scoreData.pendingScores[0].id;
+                
+                await fetch('/api/scores/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: [pendingId] })
+                });
+                
+                showMessage('success', `Bonus Social di ${points} pt assegnato a ${userObj.teamName}!`);
+                fetchData();
+            }
+        } catch (e) {
+            console.error(e);
+            showMessage('error', 'Errore durante l\'assegnazione');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (authLoading || (!user || user.role !== 'admin')) return <div className="loading"><div className="spinner"></div></div>;
 
@@ -682,12 +733,13 @@ export default function AdminPage() {
             </div>
 
             <div className="tabs" style={{ display: 'flex', gap: 10, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-                {['scaletta', 'organizzatori', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi', 'dettaglio_g1'].map(tab => (
+                {['scaletta', 'organizzatori', 'social_bonus', 'revisione', 'concorrenti', 'regole', 'storico', 'avvisi', 'dettaglio_g1'].map(tab => (
                     <button key={tab}
                         className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setActiveTab(tab)}>
                         {tab === 'organizzatori' ? '👥 Organizzatori' : 
                          tab === 'scaletta' ? '📋 Scaletta' : 
+                         tab === 'social_bonus' ? '📲 Bonus Social' :
                          tab === 'dettaglio_g1' ? '📊 Dettaglio G1' :
                          tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
@@ -1439,6 +1491,61 @@ export default function AdminPage() {
                                 <div style={{ padding: 40, textAlign: 'center', opacity: 0.5 }}>Nessun risultato per "{userSearch}"</div>
                             )}
                             {users.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>Nessun utente registrato</div>}
+                        </div>
+                    </div>
+                )}
+
+                {/* === BONUS SOCIAL === */}
+                {activeTab === 'social_bonus' && (
+                    <div>
+                        <h2 className="card-title">📱 Bonus Social (Direttamente alle Squadre)</h2>
+                        <p style={{ marginBottom: 20, color: 'var(--text-light)' }}>
+                            Assegna punti extra alle squadre per i follow sui social. I punti verranno aggiunti al totale finale senza essere raddoppiati dal capitano.
+                        </p>
+                        
+                        <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+                                    <tr>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left' }}>Squadra</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left' }}>Giocatore</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'center' }}>Punti Social</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'right' }}>Azione</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users.filter(u => u.teamName).sort((a,b) => a.teamName.localeCompare(b.teamName)).map(u => (
+                                        <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                            <td style={{ padding: '12px 20px', fontWeight: 'bold', color: 'var(--primary)' }}>{u.teamName}</td>
+                                            <td style={{ padding: '12px 20px', fontSize: '0.9rem' }}>{u.name}</td>
+                                            <td style={{ padding: '12px 20px', textAlign: 'center' }}>
+                                                <input 
+                                                    type="number" 
+                                                    className="form-input" 
+                                                    style={{ width: '100px', textAlign: 'center', padding: '8px' }} 
+                                                    id={`social-pts-${u.id}`}
+                                                    placeholder="0"
+                                                />
+                                            </td>
+                                            <td style={{ padding: '12px 20px', textAlign: 'right' }}>
+                                                <button 
+                                                    className="btn btn-primary"
+                                                    style={{ padding: '8px 20px' }}
+                                                    onClick={() => {
+                                                        const input = document.getElementById(`social-pts-${u.id}`);
+                                                        const pts = parseInt(input.value);
+                                                        if (isNaN(pts) || pts === 0) return alert('Inserisci un punteggio valido');
+                                                        handleAssignSocialBonus(u, pts);
+                                                        input.value = ''; // Reset input
+                                                    }}
+                                                >
+                                                    Invia
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 )}

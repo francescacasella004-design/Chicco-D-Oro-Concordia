@@ -67,7 +67,13 @@ export default function ClassificaPage() {
 
             <section className="section">
                 <div className="container" style={{ maxWidth: 700 }}>
-                    {!resultsPublished ? (
+                    {(!resultsPublished && user?.role === 'admin') && (
+                        <div className="alert alert-info" style={{ marginBottom: 24, background: 'rgba(52, 152, 219, 0.1)', border: '2px solid #3498db', color: '#2980b9', fontWeight: 'bold', textAlign: 'center' }}>
+                            👀 MODO BOZZA ADMIN: Questa classifica non è ancora pubblica. I giocatori vedono solo l'elenco alfabetico.
+                        </div>
+                    )}
+
+                    {(!resultsPublished && user?.role !== 'admin') ? (
                         <div className="container" style={{ maxWidth: 600 }}>
                             <div className="card" style={{ textAlign: 'center', marginBottom: 24, padding: 20 }}>
                                 <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>

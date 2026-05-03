@@ -1101,11 +1101,14 @@ export default function AdminPage() {
                             </div>
                         )}
 
-                        <div style={{ marginTop: 48 }}>
-                            <h2 className="card-title" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                                🏆 Classifiche Parziali (Solo Admin)
+                        <div style={{ marginTop: 48, border: '3px solid var(--primary)', borderRadius: 16, padding: 24, background: 'rgba(var(--primary-rgb), 0.02)' }}>
+                            <h2 className="card-title" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 10, fontSize: '1.8rem' }}>
+                                🏆 BOZZA CLASSIFICA FINALE (Solo Admin)
                             </h2>
-                            <p style={{marginBottom: 20, fontSize: '0.9rem', color: 'var(--text-light)'}}>Qui puoi vedere come sarebbe la classifica se confermassi i punti ora. Non visibile ai giocatori.</p>
+                            <p style={{marginBottom: 20, fontSize: '1rem', color: 'var(--text-light)', borderLeft: '4px solid var(--primary)', paddingLeft: 15}}>
+                                <strong>⚠️ MODO BOZZA ATTIVO:</strong> Questa classifica include i punti di stasera ma è <strong>completamente invisibile</strong> ai giocatori. 
+                                Verrà mostrata online solo quando premerai il tasto <span style={{color: 'var(--primary)', fontWeight: 'bold'}}>PUBBLICA CLASSIFICA LIVE</span> qui sotto.
+                            </p>
                             
                             <div className="grid grid-3" style={{ gap: 20 }}>
                                 {[1, 2, 'final'].map(day => (

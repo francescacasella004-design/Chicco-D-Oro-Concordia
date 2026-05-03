@@ -516,10 +516,7 @@ export default function AdminPage() {
         }
     };
 
-    const getConsensusScores = () => {
-        const admin2 = users.filter(u => u.role === 'admin')[1]; // Il secondo admin nella lista
-        const admin2Id = admin2 ? admin2.id : null;
-
+    const getConsensusScores = (filterByPerformance = null) => {
         const groups = {};
         pendingScores.forEach(ps => {
             const key = `${ps.competitorId}-${ps.bonusMalusId}-${ps.day}`;
@@ -527,14 +524,11 @@ export default function AdminPage() {
             groups[key].push(ps);
         });
 
-        return Object.values(groups)
+        let results = Object.values(groups)
             .filter(group => {
                 const uniqueAdmins = new Set(group.map(s => s.assignedById));
-                const isMalus = group[0].bonusMalus.points < 0;
-                const putByAdmin2 = admin2Id && group.some(s => s.assignedById === admin2Id);
-
-                // Regola: Almeno 2 admin OPPURE è un Malus messo dall'Admin 2
-                return uniqueAdmins.size >= 2 || (isMalus && putByAdmin2);
+                // Regola della seconda serata: Almeno 2 admin su 3 coerenti
+                return uniqueAdmins.size >= 2;
             })
             .map(group => ({
                 ...group[0],
@@ -542,16 +536,33 @@ export default function AdminPage() {
                 allIds: group.map(s => s.id)
             }))
             .sort((a, b) => a.competitor.name.localeCompare(b.competitor.name));
+
+        if (filterByPerformance && filterByPerformance.type !== 'extra') {
+            const performanceCompIds = filterByPerformance.participants
+                .map(pName => findCompetitorByName(pName)?.id)
+                .filter(id => id !== undefined);
+            
+            results = results.filter(cs => performanceCompIds.includes(cs.competitorId));
+        }
+
+        return results;
     };
 
-    const handleConfirmConsensus = async () => {
-        const consensus = getConsensusScores();
-        if (consensus.length === 0) return alert("Nessun punteggio ha raggiunto il consenso (almeno 2 admin).");
+    const handleConfirmConsensus = async (performance = null) => {
+        const consensus = getConsensusScores(performance);
+        if (consensus.length === 0) {
+            if (performance) return; // Silent if specifically checking a performance
+            return alert("Nessun punteggio ha raggiunto il consenso (almeno 2 admin).");
+        }
         
         const allIdsToRemove = consensus.flatMap(c => c.allIds);
         const representativeIds = consensus.map(c => c.id);
 
-        if (!confirm(`Stai per confermare ${consensus.length} punteggi validati. Verranno rimosse ${allIdsToRemove.length} voci totali dalla revisione. Continuare?`)) return;
+        const msg = performance 
+            ? `Confermi i ${consensus.length} punteggi validati per questa esibizione?`
+            : `Stai per confermare ${consensus.length} punteggi validati. Verranno rimosse ${allIdsToRemove.length} voci totali dalla revisione. Continuare?`;
+
+        if (!confirm(msg)) return;
 
         setLoading(true);
         try {
@@ -570,7 +581,7 @@ export default function AdminPage() {
                         fetch(`/api/scores/pending?id=${id}`, { method: 'DELETE' })
                     ));
                 }
-                showMessage('success', 'Consenso confermato e pulizia completata!');
+                showMessage('success', performance ? 'Punteggi esibizione confermati!' : 'Consenso confermato e pulizia completata!');
                 fetchData();
             } else {
                 showMessage('error', 'Errore nella conferma');
@@ -799,6 +810,35 @@ export default function AdminPage() {
                                             <span className={`tag ${selectedPerformance.type === 'group' ? 'tag-category' : ''}`} style={{ fontSize: '0.75rem', marginTop: 4 }}>
                                                 {selectedPerformance.type === 'group' ? 'PUNTEGGIO DI GRUPPO' : 'PUNTEGGI INDIVIDUALI'}
                                             </span>
+                                            {selectedPerformance.type !== 'extra' && (
+                                                <div style={{ marginTop: 12 }}>
+                                                    {getConsensusScores(selectedPerformance).length > 0 ? (
+                                                        <div style={{ background: '#e8f5e9', border: '1px solid #27ae60', padding: '12px', borderRadius: 8 }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                                                <strong style={{ color: '#27ae60', fontSize: '0.85rem' }}>✨ {getConsensusScores(selectedPerformance).length} PUNTEGGI VALIDATI (2/3 ADMIN)</strong>
+                                                                <button 
+                                                                    className="btn btn-sm" 
+                                                                    style={{ background: '#27ae60', color: 'white', fontWeight: 'bold' }}
+                                                                    onClick={() => handleConfirmConsensus(selectedPerformance)}
+                                                                >
+                                                                    ✅ CONFERMA E INVIA LIVE
+                                                                </button>
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                                                {getConsensusScores(selectedPerformance).map((cs, idx) => (
+                                                                    <div key={idx} style={{ fontSize: '0.7rem', background: 'white', padding: '4px 8px', borderRadius: 4, border: '1px solid #c8e6c9' }}>
+                                                                        <strong>{cs.competitor.name}</strong>: {cs.bonusMalus.points > 0 ? '+' : ''}{cs.bonusMalus.points} ({cs.voters.length} admin)
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div style={{ background: '#f8f9fa', border: '1px solid #ddd', padding: '10px', borderRadius: 8, fontSize: '0.8rem', color: '#666', textAlign: 'center' }}>
+                                                            Attendendo consenso (2/3 admin) per questa esibizione...
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
 
                                         <input 
